@@ -1,0 +1,4037 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>パンツ600枚集めろ！</title>
+  <style>
+    :root {
+      --ink: #24221f;
+      --muted: #746f67;
+      --paper: #fffdf7;
+      --panel: #ffffff;
+      --line: #dad2c4;
+      --red: #ef5b54;
+      --yellow: #f5c542;
+      --teal: #21a1a1;
+      --blue: #4c7fe5;
+      --green: #58aa55;
+      --pink: #ef7fb1;
+      --violet: #7e65c8;
+      --shadow: 0 18px 40px rgba(36, 34, 31, .14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 16% 14%, rgba(245, 197, 66, .24), transparent 22rem),
+        linear-gradient(135deg, #fff7df 0%, #f4fbff 47%, #fff0f6 100%);
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 18px 0 36px;
+    }
+
+    .topbar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .mini-pants {
+      width: 42px;
+      height: 28px;
+      border-radius: 7px 7px 14px 14px;
+      background: var(--red);
+      border: 3px solid var(--ink);
+      position: relative;
+      box-shadow: 4px 4px 0 var(--yellow);
+    }
+
+    .mini-pants::before,
+    .mini-pants::after {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 14px;
+      bottom: -3px;
+      background: var(--paper);
+      border-top: 3px solid var(--ink);
+    }
+
+    .mini-pants::before { left: 7px; transform: rotate(-12deg); }
+    .mini-pants::after { right: 7px; transform: rotate(12deg); }
+
+    .stats {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      min-height: 34px;
+      padding: 7px 12px;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.76);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .screen {
+      display: none;
+      min-height: 680px;
+      background: rgba(255, 253, 247, .86);
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .screen.active {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    body[data-screen="homeScreen"] .topbar {
+      display: none;
+    }
+
+    body[data-screen="homeScreen"] .app {
+      width: min(100%, 1280px);
+      padding-top: 0;
+    }
+
+    #homeScreen {
+      min-height: auto;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .home-artboard {
+      position: relative;
+      width: min(100%, 720px);
+      aspect-ratio: 720 / 1280;
+      margin: 0 auto;
+      overflow: hidden;
+      background: #c48656;
+    }
+
+    .home-bg {
+      position: absolute;
+      inset: 0;
+      background: url("assets/home/home-bg-mobile.jpg") center / cover no-repeat;
+      image-rendering: pixelated;
+    }
+
+    .home-pants-mountain {
+      position: absolute;
+      left: 50%;
+      bottom: 36%;
+      width: 70%;
+      aspect-ratio: 1280 / 838;
+      background: url("assets/home/pants-mountain.png") center bottom / contain no-repeat;
+      image-rendering: pixelated;
+      pointer-events: none;
+      z-index: 1;
+      opacity: var(--mountain-opacity, .18);
+      transform: translate(-50%, var(--mountain-rise, 78%));
+      transition: transform .7s cubic-bezier(.17,.84,.26,1), opacity .7s ease;
+      filter: drop-shadow(0 8px 0 rgba(36,34,31,.12));
+    }
+
+    .home-floor-pants {
+      position: absolute;
+      left: 50%;
+      bottom: 39%;
+      width: 46%;
+      aspect-ratio: 1256 / 831;
+      background: url("assets/home/floor-pants.png") center bottom / contain no-repeat;
+      image-rendering: pixelated;
+      pointer-events: none;
+      z-index: 1;
+      opacity: var(--floor-pants-opacity, 0);
+      transform: translate(-50%, var(--floor-pants-rise, 18%));
+      transition: transform .7s cubic-bezier(.17,.84,.26,1), opacity .7s ease;
+      filter: drop-shadow(0 7px 0 rgba(36,34,31,.12));
+    }
+
+    .home-panda {
+      position: absolute;
+      left: var(--home-panda-left, 50%);
+      top: var(--home-panda-top, 47%);
+      width: var(--home-panda-width, 44%);
+      aspect-ratio: var(--home-panda-ratio, 1021 / 1163);
+      transform: translate(-50%, -50%);
+      border: 0;
+      padding: 0;
+      background: url("assets/home/panda-default.png") center / contain no-repeat;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 8px 0 rgba(36,34,31,.16));
+      touch-action: manipulation;
+      z-index: 2;
+    }
+
+    .home-panda:active,
+    .home-panda.reacting {
+      background-image: var(--reaction-panda-image);
+      --home-panda-left: var(--reaction-panda-left, 50%);
+      --home-panda-top: var(--reaction-panda-top, 48%);
+      --home-panda-width: var(--reaction-panda-width, 31%);
+      --home-panda-ratio: var(--reaction-panda-ratio, 518 / 1252);
+      transform: translate(-50%, -50%) scale(1.025);
+    }
+
+    .home-panda:focus-visible {
+      outline: 4px solid rgba(255, 255, 255, .9);
+      outline-offset: 6px;
+    }
+
+    .home-bubble {
+      position: absolute;
+      left: var(--default-bubble-left, 58%);
+      top: var(--default-bubble-top, 32.5%);
+      width: var(--default-bubble-width, 31%);
+      aspect-ratio: var(--default-bubble-ratio, 1155 / 688);
+      background: var(--default-bubble-image, url("assets/home/panda-bubble-default.png")) center / contain no-repeat;
+      image-rendering: pixelated;
+      pointer-events: none;
+      z-index: 4;
+      filter: drop-shadow(0 5px 0 rgba(36,34,31,.14));
+    }
+
+    .home-latest-helper {
+      position: absolute;
+      left: 17%;
+      top: 53%;
+      width: 22%;
+      aspect-ratio: 744 / 845;
+      background: url("assets/home/latest-helper.png") center / contain no-repeat;
+      image-rendering: pixelated;
+      pointer-events: none;
+      z-index: 2;
+      filter: drop-shadow(0 6px 0 rgba(36,34,31,.14));
+    }
+
+    .home-latest-pants {
+      position: absolute;
+      left: 18%;
+      top: 42.8%;
+      width: 20%;
+      aspect-ratio: 1.45 / 1;
+      pointer-events: none;
+      z-index: 3;
+      filter: drop-shadow(0 5px 0 rgba(36,34,31,.16));
+    }
+
+    .home-latest-pants.hidden {
+      display: none;
+    }
+
+    .home-latest-pants .pants-preview {
+      width: 100%;
+      height: 100%;
+      filter: none;
+    }
+
+    .home-latest-pants .special-image-box {
+      width: 100%;
+      height: 100%;
+      filter: none;
+    }
+
+    .home-panda:active + .home-bubble,
+    .home-panda.reacting + .home-bubble {
+      left: var(--reaction-bubble-left, 55%);
+      top: var(--reaction-bubble-top, 32.2%);
+      width: var(--reaction-bubble-width, 37%);
+      aspect-ratio: var(--reaction-bubble-ratio, 1202 / 571);
+      background-image: var(--reaction-bubble-image);
+      transform: scale(1.025);
+    }
+
+    .home-count {
+      position: absolute;
+      z-index: 3;
+      display: grid;
+      place-items: center;
+      height: 2.9%;
+      padding: 0 .4%;
+      border-radius: 5px;
+      background: #302d2e;
+      color: #fff;
+      font-weight: 950;
+      letter-spacing: 0;
+      line-height: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-shadow: 2px 2px 0 rgba(0,0,0,.55);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.14);
+      pointer-events: none;
+    }
+
+    .home-count.dex-count {
+      left: 16.7%;
+      top: 20.55%;
+      width: 13.7%;
+      font-size: clamp(10px, 2.35vw, 15px);
+    }
+
+    .home-count.special-count {
+      left: 72.6%;
+      top: 20.55%;
+      width: 13.7%;
+      font-size: clamp(10px, 2.35vw, 15px);
+    }
+
+    .home-hotspot {
+      position: absolute;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: transparent;
+      box-shadow: none;
+      padding: 0;
+      z-index: 2;
+    }
+
+    .home-hotspot:focus-visible {
+      outline: 4px solid rgba(255, 255, 255, .9);
+      outline-offset: -8px;
+    }
+
+    .home-hotspot.make {
+      left: 16%;
+      top: 68.8%;
+      width: 68%;
+      height: 8.6%;
+    }
+
+    .home-hotspot.title {
+      left: 14%;
+      top: 2.2%;
+      width: 72%;
+      height: 12.8%;
+    }
+
+    .home-hotspot.dex {
+      left: 16%;
+      top: 77.7%;
+      width: 68%;
+      height: 8.6%;
+    }
+
+    .home-hotspot.collection {
+      left: 16%;
+      top: 84.9%;
+      width: 68%;
+      height: 10.2%;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      min-height: 680px;
+    }
+
+    .main {
+      padding: 34px;
+    }
+
+    .side {
+      border-left: 3px solid var(--ink);
+      background: #fbf4df;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    h1, h2, h3, p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 730px;
+      margin-bottom: 14px;
+      font-size: clamp(42px, 7vw, 86px);
+      line-height: .96;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: clamp(30px, 4.5vw, 52px);
+      line-height: 1.05;
+      margin-bottom: 10px;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .lead {
+      max-width: 660px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-top: 24px;
+    }
+
+    .btn {
+      min-height: 46px;
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 3px solid var(--ink);
+      color: var(--ink);
+      background: var(--yellow);
+      font-weight: 900;
+      box-shadow: 4px 4px 0 var(--ink);
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    .btn.secondary {
+      background: var(--panel);
+    }
+
+    .btn.danger {
+      background: #ffddd8;
+    }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    .factory {
+      display: grid;
+      place-items: center;
+      min-height: 360px;
+      border: 3px dashed var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(36,34,31,.04) 1px, transparent 1px),
+        linear-gradient(rgba(36,34,31,.04) 1px, transparent 1px),
+        #fffaf0;
+      background-size: 34px 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #titleScreen .factory {
+      border-style: solid;
+      background: #f6d08b;
+    }
+
+    .title-loop {
+      position: relative;
+      width: min(100%, 620px);
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: #f6d08b;
+      box-shadow: 8px 8px 0 rgba(36, 34, 31, .18);
+    }
+
+    .title-loop img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+    }
+
+    .title-line {
+      position: absolute;
+      top: 4%;
+      right: 2%;
+      width: 36%;
+      min-height: 22%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      padding: 6px 12px 10px;
+      color: var(--ink);
+      font-size: clamp(17px, 2.4vw, 28px);
+      font-weight: 900;
+      line-height: 1.25;
+      text-align: center;
+      word-break: keep-all;
+      white-space: pre-line;
+      opacity: 0;
+      pointer-events: none;
+      text-shadow: 2px 2px 0 rgba(255, 255, 255, .72);
+    }
+
+    .title-line span {
+      display: block;
+      width: 100%;
+      min-height: 1.25em;
+      text-align: center;
+    }
+
+    .title-line.visible {
+      opacity: 1;
+    }
+
+    .panda {
+      width: 220px;
+      height: 230px;
+      position: relative;
+    }
+
+    .ear {
+      position: absolute;
+      top: 6px;
+      width: 62px;
+      height: 62px;
+      background: var(--ink);
+      border-radius: 50%;
+    }
+
+    .ear.left { left: 28px; }
+    .ear.right { right: 28px; }
+
+    .face {
+      position: absolute;
+      inset: 30px 18px 8px;
+      background: var(--panel);
+      border: 4px solid var(--ink);
+      border-radius: 48% 48% 42% 42%;
+    }
+
+    .eye {
+      position: absolute;
+      top: 76px;
+      width: 48px;
+      height: 58px;
+      background: var(--ink);
+      border-radius: 48%;
+    }
+
+    .eye.left { left: 50px; transform: rotate(14deg); }
+    .eye.right { right: 50px; transform: rotate(-14deg); }
+
+    .eye::after {
+      content: "";
+      position: absolute;
+      width: 11px;
+      height: 11px;
+      top: 14px;
+      left: 19px;
+      background: white;
+      border-radius: 50%;
+    }
+
+    .nose {
+      position: absolute;
+      left: 50%;
+      top: 136px;
+      width: 30px;
+      height: 20px;
+      transform: translateX(-50%);
+      background: var(--ink);
+      border-radius: 50%;
+    }
+
+    .hat {
+      position: absolute;
+      z-index: 2;
+      top: 4px;
+      left: 66px;
+      width: 88px;
+      height: 50px;
+      border: 4px solid var(--ink);
+      border-radius: 6px 6px 0 0;
+      background: var(--yellow);
+      transform: rotate(-5deg);
+    }
+
+    .hat::after {
+      content: "工場長";
+      position: absolute;
+      inset: 12px 0 0;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .speech {
+      margin: 14px 0 0;
+      padding: 14px 16px;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: var(--panel);
+      font-weight: 900;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .thread-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .choice {
+      min-height: 186px;
+      padding: 10px;
+      border: 3px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      text-align: left;
+      display: grid;
+      align-content: center;
+      gap: 8px;
+      transition: border .12s ease, transform .12s ease, box-shadow .12s ease;
+    }
+
+    .thread-art {
+      display: block;
+      width: 100%;
+      height: 142px;
+      object-fit: contain;
+      margin-bottom: 0;
+      image-rendering: pixelated;
+    }
+
+    .choice strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 18px;
+    }
+
+    .choice span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .choice.selected {
+      border-color: var(--ink);
+      box-shadow: 4px 4px 0 var(--ink);
+      transform: translate(-2px, -2px);
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px 14px;
+      margin-top: 18px;
+      padding: 12px;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: rgba(255, 253, 247, .72);
+    }
+
+    .color-choice {
+      min-height: 72px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      display: grid;
+      grid-template-rows: 46px auto;
+      place-items: center;
+      gap: 6px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    .swatch {
+      width: min(54px, 100%);
+      height: 42px;
+      border-radius: 7px;
+      border: 3px solid var(--ink);
+      box-shadow:
+        inset 4px 4px 0 rgba(255,255,255,.34),
+        inset -4px -4px 0 rgba(0,0,0,.16),
+        0 0 0 4px #ded8cb;
+    }
+
+    .color-choice.selected {
+      box-shadow: none;
+    }
+
+    .color-choice.selected .swatch {
+      box-shadow:
+        inset 4px 4px 0 rgba(255,255,255,.34),
+        inset -4px -4px 0 rgba(0,0,0,.16),
+        0 0 0 4px #61d1ec,
+        0 0 0 8px rgba(97, 209, 236, .28);
+    }
+
+    .color-name {
+      font-size: 15px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .stage {
+      display: grid;
+      grid-template-columns: minmax(280px, .9fr) minmax(0, 1fr);
+      gap: 26px;
+      align-items: center;
+      min-height: 470px;
+    }
+
+    .machine {
+      min-height: 390px;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: #f7f1e7;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pants-preview {
+      width: min(330px, 74vw);
+      aspect-ratio: 1.45 / 1;
+      position: relative;
+      --pants-color: #ef5b54;
+      --pants-mask: url("assets/base-pants/pants-boxer.png");
+      filter: drop-shadow(8px 10px 0 rgba(36,34,31,.18));
+    }
+
+    .pants-tint,
+    .pants-art {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .pants-tint {
+      background: var(--pants-color, #ef5b54);
+      -webkit-mask-image: var(--pants-mask);
+      mask-image: var(--pants-mask);
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      z-index: 2;
+      opacity: .72;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    .pants-art {
+      object-fit: contain;
+      image-rendering: pixelated;
+      z-index: 1;
+      opacity: 1;
+      pointer-events: none;
+    }
+
+    .pants-preview.gold .pants-tint {
+      background: linear-gradient(135deg, #8b5d00, #f8de72, #fff8bd, #d99b16);
+    }
+
+    .pants-preview.rainbow .pants-tint {
+      background: linear-gradient(105deg, #ef5b54, #f5c542, #58aa55, #21a1a1, #4c7fe5, #ef7fb1);
+    }
+
+    .pants-preview.compact {
+      width: 74px;
+      height: 58px;
+      filter: drop-shadow(3px 4px 0 rgba(36,34,31,.14));
+    }
+
+    .cut-machine {
+      width: min(380px, 100%);
+      display: grid;
+      gap: 20px;
+      place-items: center;
+    }
+
+    .cloth-panel {
+      width: min(330px, 78vw);
+      height: 210px;
+      border: 5px solid var(--ink);
+      border-radius: 8px;
+      background:
+        repeating-linear-gradient(90deg, rgba(36,34,31,.08) 0 2px, transparent 2px 22px),
+        repeating-linear-gradient(0deg, rgba(36,34,31,.06) 0 2px, transparent 2px 22px),
+        #fff8e8;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cloth-panel::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 24px;
+      bottom: 24px;
+      border-left: 5px dashed rgba(36,34,31,.42);
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+
+    .cut-cloth {
+      position: absolute;
+      inset: 18px 24px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.78), rgba(242,228,200,.72)),
+        url("assets/base-pants/pants-trunks.png") center / contain no-repeat;
+      filter: drop-shadow(5px 6px 0 rgba(36,34,31,.16));
+      image-rendering: pixelated;
+      transition: clip-path .62s ease;
+    }
+
+    .cloth-panel.cutting .cut-cloth {
+      clip-path: polygon(0 0, 46% 0, 42% 100%, 0 100%, 0 0, 54% 0, 100% 0, 100% 100%, 58% 100%, 54% 0);
+    }
+
+    .scissor {
+      position: absolute;
+      left: 50%;
+      top: 82%;
+      width: 148px;
+      height: 118px;
+      transform: translate(-50%, -50%) rotate(-88deg);
+      transition: top .72s cubic-bezier(.17,.84,.26,1), transform .72s cubic-bezier(.17,.84,.26,1);
+      z-index: 3;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      filter: drop-shadow(5px 6px 0 rgba(36,34,31,.18));
+    }
+
+    .scissor.dragging {
+      cursor: grabbing;
+      transition: none;
+    }
+
+    .scissor.dragging .scissor-half {
+      transition: transform .05s linear;
+    }
+
+    .cloth-panel.cutting .scissor {
+      top: 22%;
+      transform: translate(-50%, -50%) rotate(-96deg) scale(.96);
+    }
+
+    .scissor-half {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+      pointer-events: none;
+      transform-origin: 52% 56%;
+      transition: transform .16s ease;
+    }
+
+    .scissor-half.red {
+      z-index: 2;
+      transform: rotate(0deg);
+    }
+
+    .scissor-half.blue {
+      z-index: 1;
+      transform: rotate(0deg) translate(2px, 1px);
+    }
+
+    .scissor.dragging .scissor-half.red {
+      transform: rotate(var(--red-close, 0deg));
+    }
+
+    .scissor.dragging .scissor-half.blue {
+      transform: rotate(var(--blue-close, 0deg)) translate(2px, 1px);
+    }
+
+    .cloth-panel.cutting .scissor-half.red {
+      animation: snipRedHalf .26s ease-in-out 3;
+    }
+
+    .cloth-panel.cutting .scissor-half.blue {
+      animation: snipBlueHalf .26s ease-in-out 3;
+    }
+
+    .blade {
+      position: absolute;
+      right: 0;
+      top: 34px;
+      width: 72px;
+      height: 13px;
+      border: 3px solid var(--ink);
+      background: #d9dee5;
+      transform-origin: 12px 50%;
+    }
+
+    .blade.one { transform: rotate(-24deg); }
+    .blade.two { transform: rotate(24deg); }
+    .cloth-panel.cutting .blade.one { animation: snipTop .28s ease-in-out 2; }
+    .cloth-panel.cutting .blade.two { animation: snipBottom .28s ease-in-out 2; }
+
+    .handle {
+      position: absolute;
+      left: 4px;
+      width: 38px;
+      height: 38px;
+      border: 8px solid var(--ink);
+      border-radius: 50%;
+      background: var(--yellow);
+    }
+
+    .handle.one { top: 6px; }
+    .handle.two { bottom: 6px; }
+
+    @keyframes snipTop {
+      50% { transform: rotate(-8deg); }
+    }
+
+    @keyframes snipBottom {
+      50% { transform: rotate(8deg); }
+    }
+
+    @keyframes snipRedHalf {
+      0%, 100% { transform: rotate(18deg); }
+      50% { transform: rotate(34deg); }
+    }
+
+    @keyframes snipBlueHalf {
+      0%, 100% { transform: rotate(-18deg) translate(2px, 1px); }
+      50% { transform: rotate(-34deg) translate(2px, 1px); }
+    }
+
+    .slot-machine {
+      width: min(330px, 78vw);
+      border: 5px solid var(--ink);
+      border-radius: 8px;
+      background: #ffe6ec;
+      padding: 14px;
+      box-shadow: 6px 6px 0 var(--ink);
+    }
+
+    .slot-machine.rare {
+      background: linear-gradient(135deg, #fff0b8, #ffd5ea, #dff7ff);
+      animation: rarePulse 1s ease-in-out infinite alternate;
+    }
+
+    .rare-banner {
+      display: none;
+      margin-bottom: 10px;
+      min-height: 34px;
+      padding: 6px 10px;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: var(--yellow);
+      text-align: center;
+      font-weight: 900;
+    }
+
+    .rare-banner.active {
+      display: block;
+    }
+
+    .slot-window {
+      height: 104px;
+      border: 4px solid var(--ink);
+      border-radius: 8px;
+      background: var(--panel);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .slot-window::before,
+    .slot-window::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 22px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .slot-window::before {
+      top: 0;
+      background: linear-gradient(#fff, rgba(255,255,255,0));
+    }
+
+    .slot-window::after {
+      bottom: 0;
+      background: linear-gradient(rgba(255,255,255,0), #fff);
+    }
+
+    .slot-reel {
+      transform: translateY(0);
+      will-change: transform;
+    }
+
+    .slot-item {
+      height: 96px;
+      display: grid;
+      grid-template-columns: 94px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .slot-item img {
+      width: 86px;
+      height: 70px;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .cut-hint {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    @keyframes rarePulse {
+      from { box-shadow: 6px 6px 0 var(--ink), 0 0 0 rgba(245,197,66,0); }
+      to { box-shadow: 6px 6px 0 var(--ink), 0 0 28px rgba(245,197,66,.8); }
+    }
+
+    .dye-workbench {
+      width: min(360px, 86vw);
+      min-height: 390px;
+      position: relative;
+      display: grid;
+      place-items: end center;
+      padding: 16px 0 8px;
+    }
+
+    .dye-workbench.special-mode {
+      min-height: 520px;
+    }
+
+    .dye-pants-handle {
+      position: absolute;
+      top: 4px;
+      left: 50%;
+      width: 190px;
+      transform: translateX(-50%);
+      z-index: 4;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      transition: top .18s ease, left .18s ease, transform .18s ease, opacity .18s ease;
+    }
+
+    .dye-pants-handle.dragging {
+      cursor: grabbing;
+      transition: none;
+    }
+
+    .dye-pants-handle.dunking {
+      animation: dunkPants .72s ease-in-out 2;
+    }
+
+    .dye-pants-handle .pants-preview {
+      width: 100%;
+      filter: drop-shadow(5px 6px 0 rgba(36,34,31,.16));
+    }
+
+    .pants-preview.dye-stage-empty .pants-tint {
+      background: #fdfcf5;
+    }
+
+    .pants-preview.dye-stage-third .pants-tint {
+      background:
+        linear-gradient(0deg, var(--pants-color, #ef5b54) 0 33%, #fdfcf5 33% 100%);
+    }
+
+    .pants-preview.dye-stage-half .pants-tint {
+      background:
+        linear-gradient(0deg, var(--pants-color, #ef5b54) 0 50%, #fdfcf5 50% 100%);
+    }
+
+    .dye-vat {
+      width: min(310px, 82vw);
+      height: 250px;
+      border: 6px solid var(--ink);
+      border-radius: 26px 26px 68px 68px;
+      background: #f3e7cc;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dye-vat.chance {
+      animation: vatChance .9s ease-in-out 2;
+    }
+
+    .dye-liquid {
+      position: absolute;
+      left: -8%;
+      right: -8%;
+      bottom: -4%;
+      height: 64%;
+      background: var(--pants-color);
+      border-top: 5px solid var(--ink);
+      animation: wave 1.8s ease-in-out infinite alternate;
+    }
+
+    .dye-liquid.gold {
+      background: linear-gradient(135deg, #8b5d00, #f8de72, #fff8bd, #d99b16);
+    }
+
+    .dye-liquid.rainbow {
+      background: linear-gradient(105deg, #ef5b54, #f5c542, #58aa55, #21a1a1, #4c7fe5, #ef7fb1);
+    }
+
+    .dye-flash {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      font-weight: 900;
+      font-size: 28px;
+      text-align: center;
+      opacity: 0;
+      transform: scale(.88);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .dye-vat.chance .dye-flash {
+      animation: flashText .9s ease-in-out 2;
+    }
+
+    @keyframes vatChance {
+      50% { box-shadow: 0 0 34px rgba(245,197,66,.9); transform: scale(1.03); }
+    }
+
+    @keyframes flashText {
+      45%, 72% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes dunkPants {
+      0%, 100% { transform: translate(-50%, 0) rotate(0deg); }
+      30% { transform: translate(-50%, 122px) rotate(-7deg); }
+      58% { transform: translate(-50%, 92px) rotate(7deg); }
+      82% { transform: translate(-50%, 128px) rotate(-4deg); }
+    }
+
+    .dye-hint {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .special-drum {
+      width: min(330px, 86vw);
+      margin-top: 20px;
+      padding: 12px;
+      border: 4px solid var(--ink);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #fff0b8, #ffd5ea, #dff7ff);
+      box-shadow: 6px 6px 0 rgba(36,34,31,.18);
+    }
+
+    .special-drum h3 {
+      margin: 0 0 8px;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    .special-drum-window {
+      height: 54px;
+      overflow: hidden;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      position: relative;
+    }
+
+    .special-drum-window::before,
+    .special-drum-window::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 14px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .special-drum-window::before {
+      top: 0;
+      background: linear-gradient(#fff, rgba(255,255,255,0));
+    }
+
+    .special-drum-window::after {
+      bottom: 0;
+      background: linear-gradient(rgba(255,255,255,0), #fff);
+    }
+
+    .special-drum-reel {
+      transform: translateY(0);
+      will-change: transform;
+    }
+
+    .special-drum-item {
+      height: 54px;
+      display: grid;
+      place-items: center;
+      padding: 0 10px;
+      color: var(--ink);
+      font-size: 18px;
+      font-weight: 950;
+      line-height: 1.1;
+      text-align: center;
+    }
+
+    .push-button {
+      width: 96px;
+      height: 76px;
+      margin: 12px auto 0;
+      display: block;
+      border: 0;
+      border-radius: 8px;
+      background: url("assets/special-pants/push-button.jpg") center / contain no-repeat;
+      image-rendering: pixelated;
+      filter: drop-shadow(4px 5px 0 rgba(36,34,31,.18));
+      transition: transform .08s ease;
+    }
+
+    .push-button:active {
+      transform: translateY(3px) scale(.96);
+    }
+
+    @keyframes wave {
+      from { transform: translateY(0) rotate(-1deg); }
+      to { transform: translateY(-10px) rotate(1deg); }
+    }
+
+    .needle-zone {
+      width: min(360px, 86vw);
+      min-height: 430px;
+      border: 4px solid var(--ink);
+      border-radius: 8px;
+      background:
+        linear-gradient(rgba(255,255,255,.45), rgba(255,255,255,.45)),
+        repeating-linear-gradient(90deg, #fffaf0 0 20px, #f5ecda 20px 40px);
+      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .sew-zone-results {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      z-index: 7;
+      justify-content: center;
+      margin-top: 0;
+      min-height: 39px;
+    }
+
+    .sew-zone-actions {
+      position: absolute;
+      top: 58px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 7;
+      margin-top: 0;
+    }
+
+    .sew-zone-actions .btn {
+      width: min(170px, 48vw);
+      min-height: 50px;
+      padding: 8px 18px;
+    }
+
+    .needle {
+      position: absolute;
+      top: 112px;
+      left: 50%;
+      width: 10px;
+      height: 104px;
+      background: linear-gradient(#f7f7f7, #aab2bd);
+      border: 3px solid var(--ink);
+      border-radius: 999px 999px 3px 3px;
+      transform: translateX(-50%);
+      z-index: 4;
+      will-change: left, top;
+    }
+
+    .needle::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 9px;
+      width: 18px;
+      height: 18px;
+      transform: translateX(-50%);
+      border: 4px solid var(--ink);
+      border-radius: 50%;
+      background: var(--panel);
+    }
+
+    .needle::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -22px;
+      width: 0;
+      height: 0;
+      transform: translateX(-50%);
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 24px solid var(--ink);
+    }
+
+    .needle.stabbing {
+      animation: needleDrop .42s ease-in-out;
+    }
+
+    @keyframes needleDrop {
+      50% { top: 184px; }
+    }
+
+    .sew-board {
+      width: min(310px, 78vw);
+      height: 230px;
+      position: absolute;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%);
+      display: grid;
+      place-items: center;
+    }
+
+    .sew-board .pants-preview {
+      width: 100%;
+    }
+
+    .stitch-holes {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 42%;
+      height: 0;
+      z-index: 5;
+    }
+
+    .stitch-hole {
+      position: absolute;
+      top: 0;
+      width: 28px;
+      height: 28px;
+      border: 4px solid var(--ink);
+      border-radius: 50%;
+      background: var(--panel);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 5px rgba(245,197,66,.34);
+    }
+
+    .stitch-hole.active {
+      background: var(--yellow);
+      animation: holePulse .6s ease-in-out infinite alternate;
+    }
+
+    .stitch-hole.hit {
+      background: #d9ffe6;
+      box-shadow: 0 0 0 5px rgba(88,170,85,.35);
+    }
+
+    .stitch-hole.miss {
+      background: #ffd9d9;
+      box-shadow: 0 0 0 5px rgba(239,91,84,.28);
+    }
+
+    @keyframes holePulse {
+      to { transform: translate(-50%, -50%) scale(1.14); }
+    }
+
+    .thread-line {
+      position: absolute;
+      left: 0;
+      top: 42%;
+      width: 0;
+      border-top: 5px dashed var(--teal);
+      z-index: 4;
+      transition: width .2s ease;
+    }
+
+    .result-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .stamp {
+      padding: 7px 10px;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: var(--panel);
+      font-weight: 900;
+      min-width: 92px;
+      text-align: center;
+    }
+
+    .stamp.perfect { background: #d9ffe6; }
+    .stamp.good { background: #fff0b8; }
+    .stamp.miss { background: #ffd9d9; }
+
+    .detail {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    .recipe {
+      display: grid;
+      gap: 10px;
+    }
+
+    .recipe div {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 2px dashed var(--line);
+      padding-bottom: 9px;
+    }
+
+    .recipe b {
+      font-weight: 900;
+    }
+
+    .material-preview {
+      margin: 14px 0 0;
+      padding: 12px;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .material-art {
+      display: block;
+      width: min(220px, 100%);
+      max-height: 150px;
+      object-fit: contain;
+      margin: 0 auto 8px;
+      image-rendering: pixelated;
+      filter: drop-shadow(4px 5px 0 rgba(36,34,31,.12));
+    }
+
+    .material-name {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    #finishScreen .main {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    #finishScreen .new-badge {
+      align-self: flex-start;
+    }
+
+    .finish-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .finish-heading-block {
+      min-width: 0;
+    }
+
+    .finish-heading-block h2 {
+      margin-bottom: 8px;
+    }
+
+    .finish-summary h3 {
+      margin: 0 0 6px;
+      font-size: clamp(22px, 3vw, 32px);
+      line-height: 1.2;
+    }
+
+    .finish-summary .detail {
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    #finishScreen .factory {
+      min-height: 380px;
+    }
+
+    #finishScreen .pants-preview {
+      width: min(390px, 78vw);
+    }
+
+    .sew-result-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+      min-width: min(320px, 100%);
+      margin-top: 4px;
+    }
+
+    .sew-result-list .stamp {
+      min-width: 88px;
+      text-transform: uppercase;
+    }
+
+    .finish-sew-box {
+      flex: 0 0 auto;
+      text-align: right;
+    }
+
+    .finish-sew-box h3 {
+      margin-bottom: 4px;
+      font-size: 18px;
+    }
+
+    .collection {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+      max-height: 620px;
+      overflow: auto;
+      padding-right: 6px;
+    }
+
+    .dex-filters {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 12px;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: rgba(255,255,255,.68);
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .filter-label {
+      min-width: 52px;
+      font-size: 13px;
+      font-weight: 950;
+      color: var(--muted);
+    }
+
+    .filter-btn {
+      min-height: 30px;
+      padding: 5px 10px;
+      border: 2px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .filter-btn.active {
+      border-color: var(--ink);
+      background: #ffe680;
+      box-shadow: 2px 2px 0 rgba(36,34,31,.18);
+    }
+
+    .dex-card {
+      min-height: 132px;
+      border: 3px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 10px;
+      display: grid;
+      gap: 7px;
+      align-content: start;
+      cursor: pointer;
+    }
+
+    .dex-card.filled {
+      border-color: var(--ink);
+    }
+
+    .dex-card.locked {
+      cursor: default;
+      border-color: #d8d1c5;
+      background: rgba(255,255,255,.52);
+    }
+
+    .dex-card.filled:hover {
+      transform: translateY(-2px);
+      box-shadow: 3px 4px 0 rgba(36,34,31,.18);
+    }
+
+    .dex-card .pants-preview {
+      margin: 0 auto;
+    }
+
+    .dex-title {
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    .dex-meta {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .dex-card.locked .pants-preview {
+      opacity: .26;
+      filter: grayscale(1);
+    }
+
+    .dex-card.locked .pants-tint {
+      display: none;
+    }
+
+    .dex-card.locked .dex-title {
+      color: var(--muted);
+    }
+
+    .special-collection {
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      max-height: none;
+    }
+
+    .special-card {
+      min-height: 238px;
+      grid-template-rows: 82px auto auto 1fr;
+      gap: 9px;
+    }
+
+    .special-card .pants-preview {
+      width: min(112px, 100%);
+      height: 78px;
+    }
+
+    .special-image-box {
+      width: min(150px, 100%);
+      height: 82px;
+      margin: 0 auto;
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(3px 4px 0 rgba(36,34,31,.14));
+    }
+
+    .special-image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .dex-card.locked .special-image-box {
+      opacity: .26;
+      filter: grayscale(1);
+    }
+
+    .dex-modal-art .special-image-box {
+      width: min(300px, 70vw);
+      height: min(210px, 46vw);
+      filter: drop-shadow(8px 10px 0 rgba(36,34,31,.18));
+    }
+
+    .pants-preview.special-preview .special-image-box {
+      width: 100%;
+      height: 100%;
+      filter: none;
+    }
+
+    .dex-modal-meta a {
+      color: var(--blue);
+      font-weight: 950;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+
+    .special-note {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 950;
+      color: var(--blue);
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+
+    .special-person {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.45;
+      text-align: left;
+      overflow-wrap: anywhere;
+    }
+
+    .special-card.locked .special-note,
+    .special-card.locked .special-person {
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .empty {
+      display: grid;
+      place-items: center;
+      min-height: 240px;
+      color: var(--muted);
+      text-align: center;
+      border: 3px dashed var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.6);
+      padding: 24px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(24,24,28,.58);
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .dex-modal-card {
+      width: min(560px, 100%);
+      max-height: min(92vh, 760px);
+      overflow: auto;
+      border: 4px solid var(--ink);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 0 18px 0 rgba(36,34,31,.26);
+    }
+
+    .dex-modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px 8px;
+    }
+
+    .dex-modal-head h3 {
+      margin: 0;
+      font-size: clamp(20px, 4vw, 30px);
+      line-height: 1.15;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 26px;
+      font-weight: 950;
+      line-height: 1;
+      box-shadow: 0 3px 0 rgba(36,34,31,.18);
+    }
+
+    .dex-modal-body {
+      padding: 0 18px 18px;
+    }
+
+    .dex-modal-art {
+      min-height: 250px;
+      display: grid;
+      place-items: center;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: #fff7df;
+      margin-bottom: 14px;
+    }
+
+    .dex-modal-art .pants-preview {
+      width: min(360px, 78vw);
+    }
+
+    .dex-modal-meta {
+      margin: 0 0 10px;
+      font-weight: 950;
+      line-height: 1.45;
+    }
+
+    .dex-modal-description {
+      margin: 0;
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 750;
+      line-height: 1.7;
+      white-space: pre-line;
+    }
+
+    .new-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 4px 10px;
+      border: 3px solid var(--ink);
+      border-radius: 999px;
+      background: var(--yellow);
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 860px) {
+      .app {
+        width: min(100% - 20px, 640px);
+        padding-top: 14px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .stats {
+        justify-content: flex-start;
+      }
+
+      .screen,
+      .screen.active,
+      .split {
+        min-height: auto;
+      }
+
+      .split {
+        grid-template-columns: 1fr;
+      }
+
+      .side {
+        border-left: 0;
+        border-top: 3px solid var(--ink);
+      }
+
+      .main,
+      .side {
+        padding: 22px;
+      }
+
+      h1 {
+        font-size: 44px;
+      }
+
+      h2 {
+        font-size: 34px;
+      }
+
+      .lead {
+        font-size: 16px;
+        line-height: 1.55;
+        margin-bottom: 16px;
+      }
+
+      .factory {
+        min-height: 260px;
+      }
+
+      #homeScreen .factory {
+        min-height: 300px;
+      }
+
+      body[data-screen="homeScreen"] .app {
+        width: min(100%, 720px);
+        padding: 0;
+      }
+
+      .home-hotspot.make,
+      .home-hotspot.dex,
+      .home-hotspot.collection {
+        left: 18%;
+        width: 64%;
+        height: 8.4%;
+      }
+
+      .home-hotspot.make {
+        top: 67.2%;
+      }
+
+      .home-hotspot.dex {
+        top: 76.6%;
+      }
+
+      .home-hotspot.collection {
+        top: 84.3%;
+        height: 10%;
+      }
+
+      #titleScreen .factory {
+        min-height: 250px;
+      }
+
+      .title-loop {
+        width: 100%;
+        max-width: 430px;
+      }
+
+      #homeScreen .panda {
+        transform: scale(.82);
+        transform-origin: center bottom;
+        margin: -18px auto -30px;
+      }
+
+      .speech {
+        margin-top: 8px;
+        padding: 12px 14px;
+        font-size: 15px;
+      }
+
+      .actions {
+        margin-top: 16px;
+      }
+
+      .side {
+        justify-content: start;
+        gap: 14px;
+        background: #fffaf0;
+      }
+
+      .side .recipe {
+        gap: 8px;
+      }
+
+      .side h3 {
+        font-size: 18px;
+        margin-bottom: 6px;
+      }
+
+      .side .detail {
+        font-size: 14px;
+        line-height: 1.55;
+        margin-bottom: 0;
+      }
+
+      #finishScreen .factory {
+        min-height: 300px;
+      }
+
+      #finishScreen .side {
+        gap: 16px;
+      }
+
+      .finish-summary h3 {
+        font-size: 22px;
+      }
+
+      .finish-top {
+        display: grid;
+        gap: 10px;
+      }
+
+      .finish-sew-box {
+        text-align: left;
+      }
+
+      .sew-result-list {
+        justify-content: flex-start;
+        min-width: 0;
+      }
+
+      .collection {
+        grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+        max-height: 560px;
+      }
+
+      .special-collection {
+        grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+        max-height: none;
+      }
+
+      .dex-filters {
+        padding: 10px;
+      }
+
+      .stage {
+        grid-template-columns: 1fr;
+      }
+
+      .grid,
+      .color-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .color-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px 8px;
+        padding: 10px;
+      }
+
+      .thread-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .choice {
+        min-height: 164px;
+        padding: 8px;
+      }
+
+      .thread-art {
+        height: 96px;
+      }
+
+      .thread-grid .choice span {
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .color-choice {
+        min-height: 64px;
+      }
+
+      .swatch {
+        width: 44px;
+        height: 34px;
+      }
+
+      .color-name {
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 460px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .thread-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .color-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px 5px;
+        padding: 8px;
+      }
+
+      .choice {
+        min-height: 150px;
+      }
+
+      .thread-grid .choice {
+        min-height: 126px;
+        padding: 6px;
+      }
+
+      .thread-art {
+        height: 108px;
+      }
+
+      .thread-grid .thread-art {
+        height: 74px;
+      }
+
+      .thread-grid .choice span {
+        font-size: 11px;
+        line-height: 1.3;
+      }
+
+      .color-choice {
+        min-height: 58px;
+        grid-template-rows: 34px auto;
+      }
+
+      .swatch {
+        width: 34px;
+        height: 28px;
+        border-width: 2px;
+        box-shadow:
+          inset 3px 3px 0 rgba(255,255,255,.34),
+          inset -3px -3px 0 rgba(0,0,0,.16),
+          0 0 0 3px #ded8cb;
+      }
+
+      .color-choice.selected .swatch {
+        box-shadow:
+          inset 3px 3px 0 rgba(255,255,255,.34),
+          inset -3px -3px 0 rgba(0,0,0,.16),
+          0 0 0 3px #61d1ec,
+          0 0 0 6px rgba(97, 209, 236, .28);
+      }
+
+      .color-name {
+        font-size: 12px;
+      }
+
+      #titleScreen .factory {
+        min-height: 220px;
+      }
+
+      #finishScreen .factory {
+        min-height: 250px;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="mini-pants" aria-hidden="true"></div>
+        <span>パンツ600枚集めろ！</span>
+      </div>
+      <div class="stats">
+        <div class="pill" id="counter">収集数 0/600</div>
+        <div class="pill" id="currentStep">タイトル</div>
+      </div>
+    </div>
+
+    <section class="screen active" id="titleScreen" aria-labelledby="titleHeading">
+      <div class="split">
+        <main class="main">
+          <h1 id="titleHeading">パンツ600枚集めろ！</h1>
+          <p class="lead">糸を選んで、切って、染めて、縫って、世界に一枚のパンツを完成させる小さな製造ゲーム。</p>
+          <div class="factory" aria-hidden="true">
+            <div class="title-loop">
+              <img id="titleFrame" src="assets/title/title-01-mountain.png" alt="">
+              <div class="title-line" id="titleLine"></div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn" data-go="homeScreen">スタート</button>
+            <button class="btn secondary" data-go="dexScreen">図鑑を見る</button>
+          </div>
+        </main>
+        <aside class="side">
+          <div>
+            <h3>今回の施策</h3>
+            <p class="detail">画像がない部分は文字と簡易図形で代用。600種類の組み合わせと、1本の製造ループを先に遊べる形にしています。</p>
+          </div>
+          <div class="recipe">
+            <div><span>形</span><b>6種類</b></div>
+            <div><span>素材</span><b>10種類</b></div>
+            <div><span>色</span><b>10種類</b></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="screen" id="homeScreen" aria-labelledby="homeHeading">
+      <h2 class="hidden" id="homeHeading">パンツ工場ホーム</h2>
+      <div class="home-artboard">
+        <div class="home-bg" role="img" aria-label="パンツ工場ホーム"></div>
+        <div class="home-pants-mountain" id="homePantsMountain" aria-hidden="true"></div>
+        <div class="home-floor-pants" id="homeFloorPants" aria-hidden="true"></div>
+        <div class="home-count dex-count" id="homeDexCount">0 / 600</div>
+        <div class="home-count special-count" id="homeSpecialCount">0 / 5</div>
+        <button class="home-panda" id="homePanda" type="button" aria-label="パンダにふれる"></button>
+        <div class="home-bubble" aria-hidden="true"></div>
+        <div class="home-latest-helper" aria-hidden="true"></div>
+        <div class="home-latest-pants hidden" id="homeLatestPants" aria-hidden="true"></div>
+        <button class="home-hotspot title" data-go="titleScreen" aria-label="スタート画面へ戻る"></button>
+        <button class="home-hotspot make" data-go="selectScreen" aria-label="パンツをつくる"></button>
+        <button class="home-hotspot dex" data-go="dexScreen" aria-label="図鑑をみる"></button>
+        <button class="home-hotspot collection" data-go="specialDexScreen" aria-label="スペシャルパンツ図鑑"></button>
+      </div>
+    </section>
+
+    <section class="screen" id="selectScreen" aria-labelledby="selectHeading">
+      <main class="main">
+        <h2 id="selectHeading">素材選択</h2>
+        <p class="lead">糸3種と通常色8色を選んで、製造ラインへ。</p>
+        <h3>糸を選ぶ</h3>
+        <div class="grid thread-grid" id="threadChoices"></div>
+        <h3 style="margin-top:28px">色を選ぶ</h3>
+        <div class="color-grid" id="colorChoices"></div>
+        <div class="actions">
+          <button class="btn" id="startCut">CUTへ進む</button>
+          <button class="btn secondary" data-go="homeScreen">ホームへ</button>
+        </div>
+      </main>
+    </section>
+
+    <section class="screen" id="cutScreen" aria-labelledby="cutHeading">
+      <main class="main">
+        <h2 id="cutHeading">CUTスロット</h2>
+        <p class="lead">布をハサミで切ると、スロットが止まってパンツの形が決まります。</p>
+        <div class="stage">
+          <div class="machine">
+            <div class="cut-machine">
+              <div class="slot-machine" id="slotMachine" aria-label="パンツの形スロット">
+                <div class="rare-banner" id="rareBanner">レアスロット！！</div>
+                <div class="slot-window">
+                  <div class="slot-reel" id="slotReel"></div>
+                </div>
+              </div>
+              <div class="cloth-panel" id="clothPanel" aria-label="切る前の布">
+                <div class="cut-cloth"></div>
+                <div class="scissor" id="cutScissor" role="button" tabindex="0" aria-label="ハサミを上にスライドして切る">
+                  <img class="scissor-half blue" src="assets/tools/scissor-blue-half.png" alt="">
+                  <img class="scissor-half red" src="assets/tools/scissor-red-half.png" alt="">
+                </div>
+              </div>
+              <div class="cut-hint">ハサミをつかんで上へスライド</div>
+            </div>
+          </div>
+          <div>
+            <h3 id="cutResultTitle">形を決めよう</h3>
+            <p class="detail" id="cutResultText">ハサミを下から上へスライドすると、布を切ってスロットが止まります。</p>
+            <div class="actions">
+              <button class="btn secondary hidden" id="toDye">染色へ</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </section>
+
+    <section class="screen" id="dyeScreen" aria-labelledby="dyeHeading">
+      <main class="main">
+        <h2 id="dyeHeading">染色</h2>
+        <p class="lead">パンツを持ってバケツへじゃぶじゃぶ。たまに金や虹に変化します。</p>
+        <div class="stage">
+          <div class="machine">
+            <div class="dye-workbench">
+              <div class="dye-pants-handle" id="dyePantsHandle" role="button" tabindex="0" aria-label="パンツをバケツに入れて染める">
+                <div class="pants-preview" id="dyePants">
+                  <div class="pants-tint"></div>
+                  <img class="pants-art" src="assets/base-pants/pants-boxer.png" alt="">
+                </div>
+              </div>
+              <div class="dye-vat" id="dyeVat">
+                <div class="dye-liquid" id="dyeLiquid"></div>
+                <div class="dye-flash" id="dyeFlash">CHANCE!</div>
+              </div>
+              <div class="dye-hint">パンツをバケツへドラッグ</div>
+              <div class="special-drum hidden" id="specialDrum" aria-label="スペシャルアカウントスロット">
+                <h3>スペシャルドラム</h3>
+                <div class="special-drum-window">
+                  <div class="special-drum-reel" id="specialDrumReel"></div>
+                </div>
+                <button class="push-button" id="specialPushButton" type="button" aria-label="スペシャルドラムを止める"></button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h3 id="dyeResultTitle">染める準備OK</h3>
+            <p class="detail" id="dyeResultText">パンツをバケツへ3回入れると染色判定が完了します。</p>
+            <div class="actions">
+              <button class="btn secondary hidden" id="toSew">縫製へ</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </section>
+
+    <section class="screen" id="sewScreen" aria-labelledby="sewHeading">
+      <main class="main">
+        <h2 id="sewHeading">縫う</h2>
+        <p class="lead">左右に揺れる針を、パンツの穴に上から下へ刺します。3箇所うまく刺せたら縫製完了。</p>
+        <div class="stage">
+          <div class="machine">
+            <div class="needle-zone">
+              <div class="result-row sew-zone-results" id="sewResults"></div>
+              <div class="actions sew-zone-actions">
+                <button class="btn" id="stitchButton">刺す</button>
+              </div>
+              <div class="needle" aria-hidden="true"></div>
+              <div class="sew-board">
+                <div class="pants-preview" id="sewPants">
+                  <div class="pants-tint"></div>
+                  <img class="pants-art" src="assets/base-pants/pants-boxer.png" alt="">
+                </div>
+                <div class="thread-line" id="threadLine"></div>
+                <div class="stitch-holes" id="stitchHoles"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h3 id="sewRound">1つ目の穴を狙う</h3>
+            <p class="detail" id="sewGuide">針が狙った穴の上に来たタイミングで刺します。</p>
+            <div class="actions">
+              <button class="btn secondary hidden" id="toFinish">完成へ</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </section>
+
+    <section class="screen" id="finishScreen" aria-labelledby="finishHeading">
+      <main class="main">
+        <div class="new-badge hidden" id="newBadge">NEW!</div>
+        <div class="finish-top">
+          <div class="finish-heading-block">
+            <h2 id="finishHeading">パンツできたー！！</h2>
+          <div class="finish-summary">
+            <h3 id="finalName">No.---</h3>
+            <p class="detail" id="finalCopy"></p>
+          </div>
+          </div>
+          <div class="finish-sew-box">
+            <h3>裁縫結果</h3>
+            <div class="sew-result-list" id="finalSewResults"></div>
+          </div>
+        </div>
+        <div class="factory">
+          <div class="pants-preview" id="finalPants">
+            <div class="pants-tint"></div>
+            <img class="pants-art" src="assets/base-pants/pants-boxer.png" alt="">
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" data-go="homeScreen">ホームへ</button>
+          <button class="btn secondary" data-go="dexScreen">図鑑で見る</button>
+          <button class="btn secondary" data-go="selectScreen">もう一枚作る</button>
+        </div>
+      </main>
+    </section>
+
+    <section class="screen" id="dexScreen" aria-labelledby="dexHeading">
+      <main class="main">
+        <h2 id="dexHeading">パンツ図鑑</h2>
+        <p class="lead">完成したパンツがここに登録されます。目標は600枚。</p>
+        <div class="actions" style="margin-top:0">
+          <button class="btn" data-go="selectScreen">パンツを作る</button>
+          <button class="btn secondary" data-go="homeScreen">ホームへ</button>
+        </div>
+        <div class="dex-filters" id="dexFilters"></div>
+        <div id="dexContent"></div>
+      </main>
+    </section>
+
+    <section class="screen" id="specialDexScreen" aria-labelledby="specialDexHeading">
+      <main class="main">
+        <h2 id="specialDexHeading">スペシャルパンツ図鑑</h2>
+        <p class="lead">特別な人とつながるパンツの図鑑。見つけたパンツには、noteアカウント名とその人の説明が入ります。</p>
+        <div class="actions" style="margin-top:0">
+          <button class="btn" data-go="dexScreen">通常図鑑へ</button>
+          <button class="btn secondary" data-go="homeScreen">ホームへ</button>
+        </div>
+        <div id="specialDexContent"></div>
+      </main>
+    </section>
+  </div>
+
+  <div class="modal hidden" id="dexModal" role="dialog" aria-modal="true" aria-labelledby="dexModalTitle">
+    <div class="dex-modal-card">
+      <div class="dex-modal-head">
+        <h3 id="dexModalTitle">No.---</h3>
+        <button class="icon-btn" id="dexModalClose" type="button" aria-label="閉じる">×</button>
+      </div>
+      <div class="dex-modal-body">
+        <div class="dex-modal-art">
+          <div class="pants-preview" id="dexModalPants">
+            <div class="pants-tint"></div>
+            <img class="pants-art" src="assets/base-pants/pants-boxer.png" alt="">
+          </div>
+        </div>
+        <p class="dex-modal-meta" id="dexModalMeta"></p>
+        <p class="dex-modal-description" id="dexModalDescription"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const screens = [...document.querySelectorAll(".screen")];
+    const counter = document.querySelector("#counter");
+    const currentStep = document.querySelector("#currentStep");
+    const pandaLine = document.querySelector("#pandaLine");
+
+    const shapes = [
+      { id: "boxer", name: "ボクサー", rarity: "normal", image: "assets/base-pants/pants-boxer.png" },
+      { id: "brief", name: "ブリーフ", rarity: "normal", image: "assets/base-pants/pants-brief.png" },
+      { id: "trunks", name: "トランクス", rarity: "normal", image: "assets/base-pants/pants-trunks.png" },
+      { id: "fundoshi", name: "ふんどし", rarity: "rare", image: "assets/base-pants/pants-fundoshi.png" },
+      { id: "bloomers", name: "かぼちゃパンツ", rarity: "rare", image: "assets/base-pants/pants-bloomers.png" },
+      { id: "winged", name: "羽付きパンツ", rarity: "special", image: "assets/base-pants/pants-winged.png" }
+    ];
+
+    const threads = [
+      { id: "thin", name: "細い糸", text: "軽やか。MISSしても味になる。", image: "assets/thread/thread-thin.png" },
+      { id: "normal", name: "普通の糸", text: "標準。まずはこれで十分。", image: "assets/thread/thread-normal.png" },
+      { id: "thick", name: "太い糸", text: "丈夫。祭りの熱量に耐える。", image: "assets/thread/thread-thick.png" }
+    ];
+
+    const normalColors = [
+      { id: "white", name: "白", value: "#fdfcf5" },
+      { id: "black", name: "黒", value: "#24221f" },
+      { id: "red", name: "赤", value: "#ef5b54" },
+      { id: "blue", name: "青", value: "#4c7fe5" },
+      { id: "yellow", name: "黄", value: "#f5c542" },
+      { id: "green", name: "緑", value: "#58aa55" },
+      { id: "pink", name: "ピンク", value: "#ef7fb1" },
+      { id: "purple", name: "紫", value: "#7e65c8" }
+    ];
+
+    const specialColors = [
+      { id: "gold", name: "金", value: "#f4c94a", special: "gold" },
+      { id: "rainbow", name: "虹", value: "#21a1a1", special: "rainbow" }
+    ];
+
+    const allColors = [...normalColors, ...specialColors];
+    const colorLore = {
+      white: "白は原点。何色にも染まっていない、すべての可能性を秘めた始まりの色です。",
+      black: "黒は覚悟。派手さに頼らず、深さと強さで勝負する色です。",
+      red: "赤は情熱、勇気、そして愛の証。見る人の背中をそっと押してくれます。",
+      blue: "青は冷静さ。あわてず、しっかり状況を見る力をくれます。",
+      yellow: "黄は前進。迷った時ほど、明るい方へ進ませてくれる色です。",
+      green: "緑は安心。毎日を穏やかに整えてくれる、やさしい色です。",
+      pink: "ピンクはときめき。かわいさと照れを同時に運んでくれます。",
+      purple: "紫はひらめき。少し不思議で、特別な気分にしてくれる色です。",
+      gold: "金は祝福。完成した瞬間から、ちょっとした伝説感をまといます。",
+      rainbow: "虹は奇跡。全部の気分をまとめて受け止める、特別な色です。"
+    };
+
+    const materialLore = {
+      cotton: "綿の質感はまっすぐで素直。最初の一枚にも、最後の一枚にも似合います。",
+      frayed: "ほつれまくりの質感は、失敗すら味に変える自由さがあります。",
+      holes: "穴あきの質感は風通し重視。守るより、軽やかに進むタイプです。",
+      mesh: "メッシュの質感は軽快。動きたい日ほど頼もしく感じます。",
+      linen: "麻の質感はさらりと自然体。気負わない強さがあります。",
+      silk: "シルクの質感はなめらか。静かに高級感をまといます。",
+      leather: "レザーの質感は攻めの気配。やさしい顔をしていても芯は強めです。",
+      fluffy: "ふわふわもこもこの質感は包容力。見た目からすでにあたたかいです。",
+      metal: "金属の質感は守備力高め。ちょっとやそっとではへこたれません。",
+      denim: "デニムの質感は日常の相棒。使うほど自分らしさが出てきます。"
+    };
+
+    const shapeLore = {
+      boxer: "ボクサー型なので、動きやすさと安心感のバランスが取れています。",
+      brief: "ブリーフ型なので、原点に立ち返るような潔さがあります。",
+      trunks: "トランクス型なので、ゆったりした余裕を忘れません。",
+      fundoshi: "ふんどし型なので、伝統と気合いをまっすぐ背負っています。",
+      bloomers: "ブルマ型なので、どこか懐かしくて元気な勢いがあります。",
+      winged: "羽付き型なので、もう地面だけを見ている場合ではありません。"
+    };
+
+    const wingedLore = {
+      angel: "羽付きパンツの中でも天使寄り。やさしさと祝福をまとって、ふわっと場を明るくします。",
+      devil: "羽付きパンツの中でも悪魔寄り。かわいい顔をして、ちょっと危険な魅力を隠しています。",
+      dove: "羽付きパンツの中でも平和の鳩寄り。争いより笑顔、勝負より調和を選ぶ一枚です。",
+      fairy: "羽付きパンツの中でも妖精寄り。軽やかで、いたずらっぽく、見ているだけで少し魔法感があります。",
+      dragon: "羽付きパンツの中でもドラゴン寄り。空を飛ぶというより、空を支配しそうな強さがあります。",
+      machine: "羽付きパンツの中でも機械天使寄り。きらめきと防御力を両立した、かなり頼れる一枚です。"
+    };
+
+    const materials = [
+      { id: "frayed", name: "ほつれまくり", image: "assets/material-samples/material-frayed.png" },
+      { id: "holes", name: "穴あき", image: "assets/material-samples/material-holes.png" },
+      { id: "cotton", name: "綿（コットン）", image: "assets/material-samples/material-cotton.png" },
+      { id: "mesh", name: "メッシュ", image: "assets/material-samples/material-mesh.png" },
+      { id: "linen", name: "麻（リネン）", image: "assets/material-samples/material-linen.png" },
+      { id: "silk", name: "シルク", image: "assets/material-samples/material-silk.png" },
+      { id: "leather", name: "レザー", image: "assets/material-samples/material-leather.png" },
+      { id: "fluffy", name: "ふわふわもこもこ", image: "assets/material-samples/material-fluffy.png" },
+      { id: "metal", name: "金属", image: "assets/material-samples/material-metal.png" },
+      { id: "denim", name: "デニム", image: "assets/material-samples/material-denim.png" }
+    ];
+    const finalPantsImages = {
+      "boxer-cotton": "assets/final-pants/boxer-cotton.png",
+      "boxer-frayed": "assets/final-pants/boxer-frayed.png",
+      "boxer-holes": "assets/final-pants/boxer-holes.png",
+      "boxer-mesh": "assets/final-pants/boxer-mesh.png",
+      "boxer-linen": "assets/final-pants/boxer-linen.png",
+      "boxer-silk": "assets/final-pants/boxer-silk.png",
+      "boxer-leather": "assets/final-pants/boxer-leather.png",
+      "boxer-fluffy": "assets/final-pants/boxer-fluffy.png",
+      "boxer-metal": "assets/final-pants/boxer-metal.png",
+      "boxer-denim": "assets/final-pants/boxer-denim.png",
+      "brief-frayed": "assets/final-pants/brief-frayed.png",
+      "brief-holes": "assets/final-pants/brief-holes.png",
+      "brief-cotton": "assets/final-pants/brief-cotton.png",
+      "brief-mesh": "assets/final-pants/brief-mesh.png",
+      "brief-linen": "assets/final-pants/brief-linen.png",
+      "brief-silk": "assets/final-pants/brief-silk.png",
+      "brief-leather": "assets/final-pants/brief-leather.png",
+      "brief-fluffy": "assets/final-pants/brief-fluffy.png",
+      "brief-metal": "assets/final-pants/brief-metal.png",
+      "brief-denim": "assets/final-pants/brief-denim.png",
+      "trunks-cotton": "assets/final-pants/trunks-cotton.png",
+      "trunks-frayed": "assets/final-pants/trunks-frayed.png",
+      "trunks-holes": "assets/final-pants/trunks-holes.png",
+      "trunks-mesh": "assets/final-pants/trunks-mesh.png",
+      "trunks-linen": "assets/final-pants/trunks-linen.png",
+      "trunks-silk": "assets/final-pants/trunks-silk.png",
+      "trunks-leather": "assets/final-pants/trunks-leather.png",
+      "trunks-fluffy": "assets/final-pants/trunks-fluffy.png",
+      "trunks-metal": "assets/final-pants/trunks-metal.png",
+      "trunks-denim": "assets/final-pants/trunks-denim.png",
+      "fundoshi-cotton": "assets/final-pants/fundoshi-cotton.png",
+      "fundoshi-frayed": "assets/final-pants/fundoshi-frayed.png",
+      "fundoshi-holes": "assets/final-pants/fundoshi-holes.png",
+      "fundoshi-mesh": "assets/final-pants/fundoshi-mesh.png",
+      "fundoshi-linen": "assets/final-pants/fundoshi-linen.png",
+      "fundoshi-silk": "assets/final-pants/fundoshi-silk.png",
+      "fundoshi-leather": "assets/final-pants/fundoshi-leather.png",
+      "fundoshi-fluffy": "assets/final-pants/fundoshi-fluffy.png",
+      "fundoshi-metal": "assets/final-pants/fundoshi-metal.png",
+      "fundoshi-denim": "assets/final-pants/fundoshi-denim.png",
+      "bloomers-cotton": "assets/final-pants/bloomers-cotton.png",
+      "bloomers-frayed": "assets/final-pants/bloomers-frayed.png",
+      "bloomers-holes": "assets/final-pants/bloomers-holes.png",
+      "bloomers-mesh": "assets/final-pants/bloomers-mesh.png",
+      "bloomers-linen": "assets/final-pants/bloomers-linen.png",
+      "bloomers-silk": "assets/final-pants/bloomers-silk.png",
+      "bloomers-leather": "assets/final-pants/bloomers-leather.png",
+      "bloomers-fluffy": "assets/final-pants/bloomers-fluffy.png",
+      "bloomers-metal": "assets/final-pants/bloomers-metal.png",
+      "bloomers-denim": "assets/final-pants/bloomers-denim.png",
+      "winged-cotton": "assets/final-pants/winged-cotton.png",
+      "winged-frayed": "assets/final-pants/winged-frayed.png",
+      "winged-holes": "assets/final-pants/winged-holes.png",
+      "winged-mesh": "assets/final-pants/winged-mesh.png",
+      "winged-linen": "assets/final-pants/winged-linen.png",
+      "winged-silk": "assets/final-pants/winged-silk.png",
+      "winged-leather": "assets/final-pants/winged-leather.png",
+      "winged-fluffy": "assets/final-pants/winged-fluffy.png",
+      "winged-metal": "assets/final-pants/winged-metal.png",
+      "winged-denim": "assets/final-pants/winged-denim.png"
+    };
+    const specialPantsEntries = [
+      {
+        id: "peperoncino",
+        number: "000",
+        unlocked: false,
+        image: "assets/special-pants/peperoncino.png",
+        item: { shape: shapes.find(shape => shape.id === "boxer"), material: materials.find(material => material.id === "cotton"), color: allColors.find(color => color.id === "white"), thread: threads[1], scores: [] },
+        title: "始まりのペペロンチーノ。",
+        note: "たかっちP",
+        noteUrl: "https://note.com/taka_taka_999",
+        articleUrl: "https://note.com/taka_taka_999/n/ndbac5227466b",
+        person: "はるまき大臣が、SNSで素直になるきっかけの記事。",
+        description: "この記事から、普段の自分を曝け出しはじめることができた。"
+      },
+      {
+        id: "takacchip",
+        number: "001",
+        unlocked: false,
+        image: "assets/special-pants/takacchip.png",
+        item: { shape: shapes.find(shape => shape.id === "boxer"), material: materials.find(material => material.id === "cotton"), color: allColors.find(color => color.id === "white"), thread: threads[1], scores: [] },
+        title: "伝説のたかっちPパンツ。",
+        note: "たかっちP",
+        noteUrl: "https://note.com/taka_taka_999",
+        articleUrl: "https://note.com/taka_taka_999",
+        person: "日常のモヤモヤを心理学で解き明かす人。",
+        description: "さらに家族への愛、疑問、全てが最後はパンツに集約される。読者は彼のパンツ待ちになり、履けばパンツの真理が開かれる。"
+      },
+      {
+        id: "takacchip-mystery",
+        number: "002",
+        unlocked: false,
+        image: "assets/special-pants/takacchip-mystery.png",
+        item: { shape: shapes.find(shape => shape.id === "boxer"), material: materials.find(material => material.id === "leather"), color: allColors.find(color => color.id === "black"), thread: threads[1], scores: [] },
+        title: "たかっちP",
+        note: "たかっちP",
+        noteUrl: "https://note.com/taka_taka_999",
+        person: "彼の周りで、なぜかこのパンツ？水着？が流行っている人。",
+        description: "なぜか、彼の周りではこのパンツ？いや水着？いやなんだ？これが流行っている。なぜだ。\n#なんのはなしですか"
+      },
+      {
+        id: "harumakidaizin",
+        number: "003",
+        unlocked: false,
+        image: "assets/special-pants/harumakidaizin.png",
+        item: { shape: shapes.find(shape => shape.id === "boxer"), material: materials.find(material => material.id === "cotton"), color: allColors.find(color => color.id === "yellow"), thread: threads[1], scores: [] },
+        title: "はるまき大臣",
+        note: "はるまき大臣",
+        noteUrl: "https://note.com/harumakidaizin",
+        person: "素直さは技術である。",
+        description: "育児も仕事もAIも創作も、失敗まで経験値にして遊びへ変える。日常をちょっとずらして考えて、急に棚を3つ買ってきたりする。"
+      },
+      {
+        id: "unchan-happy",
+        number: "004",
+        unlocked: false,
+        image: "assets/special-pants/unchan-happy.png",
+        item: { shape: shapes.find(shape => shape.id === "brief"), material: materials.find(material => material.id === "cotton"), color: allColors.find(color => color.id === "green"), thread: threads[1], scores: [] },
+        title: "開運パンツ。",
+        note: "うんちゃん",
+        noteUrl: "https://note.com/unchan_happy",
+        person: "まず試す作ってみる。なんとかなる。きっと楽しい！",
+        description: "頑張らないで等身大になれる。開運パンツ。"
+      },
+      {
+        id: "maki-asobo-kids",
+        number: "005",
+        unlocked: false,
+        image: "assets/special-pants/maki-asobo-kids.png",
+        item: { shape: shapes.find(shape => shape.id === "brief"), material: materials.find(material => material.id === "cotton"), color: allColors.find(color => color.id === "red"), thread: threads[1], scores: [] },
+        title: "今日も誰かを笑顔にできるパンツ",
+        note: "まき@こどもと日々成長中",
+        noteUrl: "https://note.com/asobo_kids",
+        person: "こどもとつくる、遊ぶ、学ぶ。こんなのがあったら良いなを形にする人。",
+        description: "小さな点をつないで大きなつながりに。今日も誰かを笑顔にできるパンツ。"
+      }
+    ];
+    const adminUnlockSpecialPants = true;
+    const debugForceSpecialDye = false;
+    const screenNames = {
+      titleScreen: "タイトル",
+      homeScreen: "ホーム",
+      selectScreen: "素材選択",
+      cutScreen: "CUT",
+      dyeScreen: "染色",
+      sewScreen: "縫製",
+      finishScreen: "完成",
+      dexScreen: "図鑑",
+      specialDexScreen: "スペシャル"
+    };
+
+    let collection = readCollection();
+    let specialWins = readSpecialWins();
+    let dyeCompletionCount = Number(localStorage.getItem("pants600DyeCompletionCount") || 0);
+    let dexFilter = { shape: "all", material: "all", color: "all", hideUnknown: false };
+    let selectedThread = threads[1];
+    let selectedColor = normalColors[0];
+    let current = {};
+    let sewStart = 0;
+    let sewCount = 0;
+    let sewScores = [];
+    let needleX = 50;
+    const stitchTargets = [30, 50, 70];
+    let markerFrame = null;
+    let slotFrame = null;
+    let slotStart = 0;
+    let slotOffset = 0;
+    let currentReelShapes = [];
+    let isRareSlot = false;
+    let cutPlayCount = 0;
+    let isCutLocked = false;
+    let cutDrag = null;
+    let isDyeAnimating = false;
+    let dyeCount = 0;
+    let dyeJudgedComplete = false;
+    let dyeDrag = null;
+    let specialDrumFrame = null;
+    let specialDrumOffset = 0;
+    let specialDrumEntries = [];
+    let isSpecialDrumActive = false;
+    const slotItemHeight = 96;
+    const slotSpeed = 150;
+    const specialDrumItemHeight = 54;
+    const specialDrumSpeed = 132;
+
+    function readCollection() {
+      try {
+        return JSON.parse(localStorage.getItem("pants600Collection")) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveCollection() {
+      localStorage.setItem("pants600Collection", JSON.stringify(collection));
+    }
+
+    function readSpecialWins() {
+      try {
+        return JSON.parse(localStorage.getItem("pants600SpecialWins")) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveSpecialWins() {
+      localStorage.setItem("pants600SpecialWins", JSON.stringify(specialWins));
+    }
+
+    function saveDyeCompletionCount() {
+      localStorage.setItem("pants600DyeCompletionCount", String(dyeCompletionCount));
+    }
+
+    function saveLatestCompletion(latest) {
+      localStorage.setItem("pants600LatestCompletion", JSON.stringify(latest));
+    }
+
+    function readLatestCompletion() {
+      try {
+        return JSON.parse(localStorage.getItem("pants600LatestCompletion")) || null;
+      } catch {
+        return null;
+      }
+    }
+
+    function showScreen(id) {
+      document.body.dataset.screen = id;
+      screens.forEach(screen => screen.classList.toggle("active", screen.id === id));
+      currentStep.textContent = screenNames[id] || "";
+      if (id === "homeScreen") updateHome();
+      if (id === "dexScreen") renderDex();
+      if (id === "specialDexScreen") renderSpecialDex();
+      if (id === "cutScreen") startSlotSpin();
+      if (id !== "cutScreen") stopSlotSpin(false);
+      if (id === "dyeScreen") setupDyeStage();
+      if (id !== "dyeScreen") stopSpecialDrum(false);
+      if (id === "sewScreen") startTiming();
+      if (id !== "sewScreen") stopTiming();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function updateCounter() {
+      counter.textContent = `収集数 ${Object.keys(collection).length}/600`;
+      updateHome();
+    }
+
+    function specialCollectionCount() {
+      return specialPantsEntries.filter(entry => specialEntryUnlocked(entry)).length;
+    }
+
+    function availableSpecialEntries() {
+      return specialPantsEntries.filter(entry => !specialWins.includes(entry.id));
+    }
+
+    function specialDyeCandidates() {
+      const peperoncino = specialPantsEntries.find(entry => entry.id === "peperoncino");
+      if (!specialWins.length && peperoncino && !specialWins.includes(peperoncino.id)) {
+        return [peperoncino];
+      }
+      return availableSpecialEntries();
+    }
+
+    function updateHome() {
+      const count = Object.keys(collection).length;
+      const homeDexCount = document.querySelector("#homeDexCount");
+      const homeSpecialCount = document.querySelector("#homeSpecialCount");
+      if (homeDexCount) homeDexCount.textContent = `${String(count).padStart(4, "\u00a0")} / 600`;
+      if (homeSpecialCount) homeSpecialCount.textContent = `${String(Math.min(specialCollectionCount(), specialPantsEntries.length)).padStart(4, "\u00a0")} / ${specialPantsEntries.length}`;
+      const mountain = document.querySelector("#homePantsMountain");
+      const floorPants = document.querySelector("#homeFloorPants");
+      if (floorPants) {
+        const floorProgress = Math.max(0, Math.min(1, (count - 10) / 20));
+        floorPants.style.setProperty("--floor-pants-opacity", count >= 10 && count < 30 ? (.25 + floorProgress * .75).toFixed(2) : "0");
+        floorPants.style.setProperty("--floor-pants-rise", `${18 - floorProgress * 18}%`);
+      }
+      if (mountain) {
+        const progress = Math.max(0, Math.min(1, (count - 30) / 570));
+        const rise = 78 - progress * 92;
+        const opacity = count >= 30 ? .25 + progress * .75 : 0;
+        mountain.style.setProperty("--mountain-rise", `${rise}%`);
+        mountain.style.setProperty("--mountain-opacity", opacity.toFixed(2));
+      }
+      const lines = [
+        [600, "祭りじゃああああ！！"],
+        [599, "あと……1枚……！！"],
+        [500, "誰が600枚集めるって言ったんだ。"],
+        [300, "やっと半分……。"],
+        [100, "まだ100枚です。"],
+        [0, "600枚？余裕でしょ。"]
+      ];
+      if (pandaLine) {
+        pandaLine.textContent = lines.find(([min]) => count >= min)[1];
+      }
+      const latest = Object.values(collection).sort((a, b) => b.createdAt - a.createdAt)[0];
+      const latestRecipe = document.querySelector("#latestRecipe");
+      if (latestRecipe) {
+        latestRecipe.innerHTML = latest
+          ? recipeMarkup(latest)
+          : `<div><span>最新作</span><b>まだなし</b></div><div><span>次の一手</span><b>作る</b></div>`;
+      }
+      renderHomeLatestPants();
+    }
+
+    function comboId(item) {
+      const shape = shapeFor(item);
+      const material = materialFor(item);
+      return `${shape.id}-${material.id}-${item.color.id}`;
+    }
+
+    function comboNumber(item) {
+      const shapeIndex = Math.max(0, shapes.findIndex(shape => shape.id === shapeFor(item).id));
+      const materialIndex = Math.max(0, materials.findIndex(material => material.id === materialFor(item).id));
+      const colorIndex = Math.max(0, allColors.findIndex(color => color.id === item.color.id));
+      return shapeIndex * 100 + materialIndex * 10 + colorIndex + 1;
+    }
+
+    function shapeFor(item) {
+      return shapes.find(shape => shape.id === item.shape?.id) || shapes[0];
+    }
+
+    function materialFor(item) {
+      const raw = item.material;
+      if (raw && typeof raw === "object") {
+        return materials.find(material => material.id === raw.id) || materials[0];
+      }
+      return materials.find(material => material.id === raw || material.name === raw)
+        || materials.find(material => material.name.includes(raw))
+        || materials[0];
+    }
+
+    function pantsImageFor(item) {
+      const shape = shapeFor(item);
+      const material = item.material ? materialFor(item) : null;
+      return finalPantsImages[`${shape.id}-${material?.id}`]
+        || finalPantsImages[`${shape.id}-cotton`]
+        || shape.image;
+    }
+
+    function slotImageFor(shape) {
+      return finalPantsImages[`${shape.id}-cotton`] || shape.image;
+    }
+
+    function recipeMarkup(item) {
+      const number = String(comboNumber(item)).padStart(3, "0");
+      const shape = shapeFor(item);
+      const material = materialFor(item);
+      return `
+        <div><span>No.</span><b>${number}</b></div>
+        <div><span>形</span><b>${shape.name}</b></div>
+        <div><span>色</span><b>${item.color.name}</b></div>
+        <div><span>素材</span><b>${material.name}</b></div>
+        <div><span>糸</span><b>${item.thread.name}</b></div>
+      `;
+    }
+
+    function pantsDescription(item) {
+      const shape = shapeFor(item);
+      const material = materialFor(item);
+      const colorText = colorLore[item.color.id] || `${item.color.name}は、その日の気分を映す色です。`;
+      const materialText = materialLore[material.id] || `${material.name}の質感が、パンツに独自の表情を与えています。`;
+      const shapeText = wingedTypeText(item, material, shape) || shapeLore[shape.id] || `${shape.name}型として、しっかり個性を持っています。`;
+      return `${colorText}\n${materialText}\n${shapeText}`;
+    }
+
+    function wingedTypeText(item, material, shape) {
+      if (shape.id !== "winged") return "";
+      if (["black", "purple"].includes(item.color.id) || material.id === "leather") return wingedLore.devil;
+      if (["white", "gold"].includes(item.color.id) || ["silk", "cotton"].includes(material.id)) return wingedLore.angel;
+      if (["blue", "green"].includes(item.color.id) || material.id === "linen") return wingedLore.dove;
+      if (["pink", "rainbow"].includes(item.color.id) || material.id === "fluffy") return wingedLore.fairy;
+      if (["red", "yellow"].includes(item.color.id) || material.id === "denim") return wingedLore.dragon;
+      if (material.id === "metal" || material.id === "mesh") return wingedLore.machine;
+      return wingedLore.fairy;
+    }
+
+    function specialEntryCollectionItem(entry) {
+      return collection[comboId(entry.item)] || null;
+    }
+
+    function specialEntryUnlocked(entry) {
+      return Boolean(adminUnlockSpecialPants || specialWins.includes(entry.id) || entry.unlocked || specialEntryCollectionItem(entry));
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function specialImageMarkup(entry, altText) {
+      return `
+        <div class="special-image-box">
+          <img src="${entry.image}" alt="${escapeHtml(altText)}">
+        </div>
+      `;
+    }
+
+    function applySpecialImage(target, entry) {
+      const preview = document.querySelector(target);
+      preview.className = "pants-preview special-preview";
+      preview.innerHTML = specialImageMarkup(entry, entry.title);
+    }
+
+    function renderHomeLatestPants() {
+      const target = document.querySelector("#homeLatestPants");
+      if (!target) return;
+      const latest = readLatestCompletion();
+      if (!latest) {
+        target.classList.add("hidden");
+        target.innerHTML = "";
+        return;
+      }
+
+      target.classList.remove("hidden");
+      if (latest.type === "special") {
+        const entry = specialPantsEntries.find(item => item.id === latest.id);
+        if (!entry) {
+          target.classList.add("hidden");
+          return;
+        }
+        target.innerHTML = `<div class="pants-preview special-preview">${specialImageMarkup(entry, entry.title)}</div>`;
+        return;
+      }
+
+      const item = collection[latest.id];
+      if (!item) {
+        target.classList.add("hidden");
+        return;
+      }
+      const pantsImage = pantsImageFor(item);
+      target.innerHTML = `
+        <div class="pants-preview ${item.color.special || ""}" style="--pants-color:${item.color.value}; --pants-mask:url('${pantsImage}')">
+          <div class="pants-tint"></div>
+          <img class="pants-art" src="${pantsImage}" alt="">
+        </div>
+      `;
+    }
+
+    function renderSpecialDrum(entries) {
+      const reel = document.querySelector("#specialDrumReel");
+      if (!reel) return;
+      const repeated = Array.from({ length: 5 }, () => entries).flat();
+      reel.innerHTML = repeated.map(entry => `
+        <div class="special-drum-item">${escapeHtml(entry.note)}</div>
+      `).join("");
+      specialDrumEntries = repeated;
+      specialDrumOffset = 0;
+      reel.style.transition = "none";
+      reel.style.transform = "translateY(0)";
+    }
+
+    function startSpecialDrum(entries) {
+      const drum = document.querySelector("#specialDrum");
+      const reel = document.querySelector("#specialDrumReel");
+      if (!drum || !reel || !entries.length) return;
+      stopSpecialDrum(false);
+      renderSpecialDrum(entries);
+      document.querySelector(".dye-workbench")?.classList.add("special-mode");
+      drum.classList.remove("hidden");
+      isSpecialDrumActive = true;
+      const start = performance.now();
+      const move = now => {
+        specialDrumOffset = ((now - start) / 1000 * specialDrumSpeed) % (specialDrumEntries.length * specialDrumItemHeight);
+        reel.style.transition = "none";
+        reel.style.transform = `translateY(-${specialDrumOffset}px)`;
+        specialDrumFrame = requestAnimationFrame(move);
+      };
+      specialDrumFrame = requestAnimationFrame(move);
+    }
+
+    function stopSpecialDrum(select = true) {
+      const reel = document.querySelector("#specialDrumReel");
+      if (specialDrumFrame) cancelAnimationFrame(specialDrumFrame);
+      specialDrumFrame = null;
+      if (!select || !reel || !specialDrumEntries.length) {
+        document.querySelector(".dye-workbench")?.classList.remove("special-mode");
+        isSpecialDrumActive = false;
+        return null;
+      }
+      const resultIndex = Math.round(specialDrumOffset / specialDrumItemHeight) % specialDrumEntries.length;
+      const entry = specialDrumEntries[resultIndex];
+      document.querySelector(".dye-workbench")?.classList.remove("special-mode");
+      const targetOffset = resultIndex * specialDrumItemHeight;
+      reel.style.transition = "transform .48s cubic-bezier(.12,.76,.16,1)";
+      reel.style.transform = `translateY(-${targetOffset}px)`;
+      specialDrumOffset = targetOffset;
+      isSpecialDrumActive = false;
+      return entry;
+    }
+
+    function chooseSpecialEntry() {
+      const entry = stopSpecialDrum(true);
+      if (!entry) return;
+      current.specialEntry = entry;
+      current.color = allColors.find(color => color.id === "rainbow") || current.color;
+      document.querySelector("#dyeResultTitle").textContent = `SPECIAL ${entry.number}`;
+      document.querySelector("#dyeResultText").textContent = `${entry.note}の「${entry.title}」に決定。次の縫製は、何が起きてもこのパンツになります。`;
+      document.querySelector("#toSew").classList.remove("hidden");
+    }
+
+    function openDexModal(itemId) {
+      const item = collection[itemId];
+      const modal = document.querySelector("#dexModal");
+      if (!item || !modal) return;
+      const number = String(comboNumber(item)).padStart(3, "0");
+      const shape = shapeFor(item);
+      const material = materialFor(item);
+      document.querySelector("#dexModalTitle").textContent = `No.${number} ${shape.name}`;
+      document.querySelector("#dexModalMeta").textContent = `${item.color.name} / ${material.name} / ${item.thread.name}`;
+      document.querySelector("#dexModalDescription").textContent = pantsDescription(item);
+      applyPants("#dexModalPants", item);
+      modal.classList.remove("hidden");
+    }
+
+    function openSpecialModal(entryId) {
+      const entry = specialPantsEntries.find(item => item.id === entryId);
+      const modal = document.querySelector("#dexModal");
+      if (!entry || !modal) return;
+      const item = specialEntryCollectionItem(entry) || entry.item;
+      document.querySelector("#dexModalTitle").textContent = entry.title;
+      const detailLinkText = entry.articleUrl ? "記事を読む" : "noteを見る";
+      document.querySelector("#dexModalMeta").innerHTML = `
+        noteアカウント <a href="${entry.noteUrl || "#"}" target="_blank" rel="noopener noreferrer">${escapeHtml(entry.note)}</a><br>
+        <a href="${entry.articleUrl || entry.noteUrl || "#"}" target="_blank" rel="noopener noreferrer">${detailLinkText}</a><br>
+        ${escapeHtml(entry.person)}
+      `;
+      document.querySelector("#dexModalDescription").textContent = entry.image
+        ? entry.description
+        : `${entry.description}\n${pantsDescription(item)}`;
+      if (entry.image) {
+        document.querySelector("#dexModalPants").className = "pants-preview special-preview";
+        document.querySelector("#dexModalPants").innerHTML = specialImageMarkup(entry, entry.title);
+      } else {
+        applyPants("#dexModalPants", item);
+      }
+      modal.classList.remove("hidden");
+    }
+
+    function closeDexModal() {
+      document.querySelector("#dexModal")?.classList.add("hidden");
+    }
+
+    function catalogItem(shape, material, color) {
+      return {
+        shape,
+        material,
+        color,
+        thread: threads[1],
+        scores: [],
+        createdAt: 0
+      };
+    }
+
+    function allCatalogItems() {
+      return shapes.flatMap(shape => materials.flatMap(material => allColors.map(color => catalogItem(shape, material, color))));
+    }
+
+    function matchesDexFilter(item) {
+      const shape = shapeFor(item);
+      const material = materialFor(item);
+      return (dexFilter.shape === "all" || shape.id === dexFilter.shape)
+        && (dexFilter.material === "all" || material.id === dexFilter.material)
+        && (dexFilter.color === "all" || item.color.id === dexFilter.color);
+    }
+
+    function renderFilterButtons(kind, items) {
+      return items.map(item => {
+        const active = dexFilter[kind] === item.id;
+        return `<button class="filter-btn ${active ? "active" : ""}" data-dex-filter="${kind}" data-filter-value="${item.id}">${item.name}</button>`;
+      }).join("");
+    }
+
+    function renderDexFilters() {
+      const filters = document.querySelector("#dexFilters");
+      if (!filters) return;
+      filters.innerHTML = `
+        <div class="filter-row">
+          <span class="filter-label">表示</span>
+          <button class="filter-btn ${!dexFilter.hideUnknown ? "active" : ""}" data-dex-filter="hideUnknown" data-filter-value="false">全部表示</button>
+          <button class="filter-btn ${dexFilter.hideUnknown ? "active" : ""}" data-dex-filter="hideUnknown" data-filter-value="true">？？？を省く</button>
+        </div>
+        <div class="filter-row">
+          <span class="filter-label">種類</span>
+          ${renderFilterButtons("shape", [{ id: "all", name: "全部" }, ...shapes])}
+        </div>
+        <div class="filter-row">
+          <span class="filter-label">質感</span>
+          ${renderFilterButtons("material", [{ id: "all", name: "全部" }, ...materials])}
+        </div>
+        <div class="filter-row">
+          <span class="filter-label">色</span>
+          ${renderFilterButtons("color", [{ id: "all", name: "全部" }, ...allColors])}
+        </div>
+      `;
+    }
+
+    function renderChoices() {
+      document.querySelector("#threadChoices").innerHTML = threads.map(thread => `
+        <button class="choice ${thread.id === selectedThread.id ? "selected" : ""}" data-thread="${thread.id}" aria-label="${thread.name}" title="${thread.name}">
+          <img class="thread-art" src="${thread.image}" alt="${thread.name}">
+          <span>${thread.text}</span>
+        </button>
+      `).join("");
+
+      document.querySelector("#colorChoices").innerHTML = normalColors.map(color => `
+        <button class="color-choice ${color.id === selectedColor.id ? "selected" : ""}" data-color="${color.id}">
+          <span class="swatch" style="background:${color.value}"></span>
+          <span class="color-name">${color.name}</span>
+        </button>
+      `).join("");
+    }
+
+    function makeSpreadPattern(pool, previousShape = null) {
+      const remaining = [...pool];
+      const pattern = [];
+      let lastShape = previousShape;
+
+      while (remaining.length) {
+        const choices = remaining.filter(shape => shape.id !== lastShape?.id);
+        const candidates = choices.length ? choices : remaining;
+        const picked = candidates[Math.floor(Math.random() * candidates.length)];
+        const pickedIndex = remaining.indexOf(picked);
+        pattern.push(picked);
+        remaining.splice(pickedIndex, 1);
+        lastShape = picked;
+      }
+
+      return pattern;
+    }
+
+    function renderSlot() {
+      const normalShapes = shapes.filter(shape => shape.rarity === "normal");
+      const rareShapes = shapes.filter(shape => shape.rarity === "rare");
+      const specialShapes = shapes.filter(shape => shape.rarity === "special");
+      const baseReel = isRareSlot
+        ? [...rareShapes, ...rareShapes, ...rareShapes, ...rareShapes, ...specialShapes, ...specialShapes, ...normalShapes]
+        : [...normalShapes, ...normalShapes, ...normalShapes, ...rareShapes];
+      const patterns = [];
+      let lastShape = null;
+
+      for (let index = 0; index < 3; index += 1) {
+        const pattern = makeSpreadPattern(baseReel, lastShape);
+        patterns.push(pattern);
+        lastShape = pattern[pattern.length - 1];
+      }
+
+      currentReelShapes = patterns.flat();
+      document.querySelector("#slotReel").innerHTML = currentReelShapes.map(shape => `
+        <div class="slot-item">
+          <img src="${slotImageFor(shape)}" alt="">
+          <span>${shape.rarity === "special" ? "★★ " : shape.rarity === "rare" ? "★ " : ""}${shape.name}</span>
+        </div>
+      `).join("");
+    }
+
+    function prepareCutSlot() {
+      cutPlayCount += 1;
+      isRareSlot = cutPlayCount % 3 === 0;
+      document.querySelector("#slotMachine").classList.toggle("rare", isRareSlot);
+      document.querySelector("#rareBanner").classList.toggle("active", isRareSlot);
+      renderSlot();
+      slotOffset = 0;
+    }
+
+    function startSlotSpin() {
+      const slotReel = document.querySelector("#slotReel");
+      if (!slotReel || slotFrame || current.shape) return;
+      slotStart = performance.now() - (slotOffset / slotSpeed) * 1000;
+      const move = now => {
+        slotOffset = ((now - slotStart) / 1000 * slotSpeed) % (currentReelShapes.length * slotItemHeight);
+        slotReel.style.transition = "none";
+        slotReel.style.transform = `translateY(-${slotOffset}px)`;
+        slotFrame = requestAnimationFrame(move);
+      };
+      slotFrame = requestAnimationFrame(move);
+    }
+
+    function stopSlotSpin(snap = true) {
+      const slotReel = document.querySelector("#slotReel");
+      if (slotFrame) cancelAnimationFrame(slotFrame);
+      slotFrame = null;
+      if (!snap || !slotReel) return null;
+      const resultIndex = Math.round(slotOffset / slotItemHeight) % currentReelShapes.length;
+      const result = currentReelShapes[resultIndex] || shapes[0];
+      const targetOffset = resultIndex * slotItemHeight;
+      slotReel.style.transition = "transform .58s cubic-bezier(.12,.76,.16,1)";
+      slotReel.style.transform = `translateY(-${targetOffset}px)`;
+      slotOffset = resultIndex * slotItemHeight;
+      return result;
+    }
+
+    function applyPants(target, item) {
+      const preview = document.querySelector(target);
+      if (!preview.querySelector(".pants-art")) {
+        preview.innerHTML = `<div class="pants-tint"></div><img class="pants-art" src="" alt="">`;
+      }
+      const art = preview.querySelector(".pants-art");
+      const shape = shapeFor(item);
+      const pantsImage = pantsImageFor(item);
+      preview.className = `pants-preview ${item.color.special || ""}`;
+      preview.style.setProperty("--pants-color", item.color.value);
+      preview.style.setProperty("--pants-mask", `url("${pantsImage}")`);
+      art.src = pantsImage;
+      art.alt = shape.name;
+    }
+
+    function applyDyePants() {
+      applyPants("#dyePants", current);
+      const preview = document.querySelector("#dyePants");
+      preview.classList.toggle("dye-stage-empty", dyeCount === 0 && !dyeJudgedComplete);
+      preview.classList.toggle("dye-stage-third", dyeCount === 1 && !dyeJudgedComplete);
+      preview.classList.toggle("dye-stage-half", dyeCount === 2 && !dyeJudgedComplete);
+    }
+
+    function resetRun() {
+      current = {
+        thread: selectedThread,
+        baseColor: selectedColor,
+        color: selectedColor,
+        shape: null,
+        material: null,
+        scores: [],
+        specialEntry: null
+      };
+      const clothPanel = document.querySelector("#clothPanel");
+      const slotReel = document.querySelector("#slotReel");
+      clothPanel.classList.remove("cutting");
+      prepareCutSlot();
+      slotReel.style.transition = "none";
+      slotReel.style.transform = "translateY(0)";
+      slotReel.offsetHeight;
+      slotReel.style.transition = "";
+      slotOffset = 0;
+      document.querySelector("#cutResultTitle").textContent = "形を決めよう";
+      document.querySelector("#cutResultText").textContent = isRareSlot
+        ? "レアスロット発動中。レア多め、羽付きパンツも少し入っています。"
+        : "ハサミを下から上へスライドすると、布を切ってスロットが止まります。";
+      isCutLocked = false;
+      const scissor = document.querySelector("#cutScissor");
+      scissor.classList.remove("dragging");
+      scissor.style.removeProperty("--red-close");
+      scissor.style.removeProperty("--blue-close");
+      scissor.style.top = "";
+      document.querySelector("#toDye").classList.add("hidden");
+      document.querySelector("#toSew").classList.add("hidden");
+      document.querySelector("#dyeResultTitle").textContent = "染める準備OK";
+      document.querySelector("#dyeResultText").textContent = "パンツをバケツへ3回入れると染色判定が完了します。";
+      document.querySelector("#specialDrum").classList.add("hidden");
+      document.querySelector(".dye-workbench")?.classList.remove("special-mode");
+      stopSpecialDrum(false);
+      const dyeVat = document.querySelector("#dyeVat");
+      const dyeLiquid = document.querySelector("#dyeLiquid");
+      const dyeHandle = document.querySelector("#dyePantsHandle");
+      dyeVat.classList.remove("chance");
+      dyeLiquid.classList.remove("gold", "rainbow");
+      dyeLiquid.style.setProperty("--pants-color", selectedColor.value);
+      dyeHandle.classList.remove("dragging", "dunking");
+      dyeHandle.style.top = "";
+      dyeHandle.style.left = "";
+      dyeHandle.style.transform = "";
+      isDyeAnimating = false;
+      dyeCount = 0;
+      dyeJudgedComplete = false;
+      dyeDrag = null;
+      document.querySelector("#dyeFlash").textContent = "CHANCE!";
+      document.querySelector("#sewResults").innerHTML = "";
+      document.querySelector("#stitchButton").disabled = false;
+      document.querySelector("#sewRound").textContent = "1つ目の穴を狙う";
+      document.querySelector("#sewGuide").textContent = "針が狙った穴の上に来たタイミングで刺します。";
+      document.querySelector("#threadLine").style.width = "0";
+      document.querySelector("#toFinish").classList.add("hidden");
+      sewCount = 0;
+      sewScores = [];
+    }
+
+    function completeCut() {
+      if (isCutLocked) return;
+      isCutLocked = true;
+      cutDrag = null;
+      const result = stopSlotSpin(true);
+      current.shape = result;
+      const clothPanel = document.querySelector("#clothPanel");
+      const scissor = document.querySelector("#cutScissor");
+      scissor.classList.remove("dragging");
+      scissor.style.removeProperty("--red-close");
+      scissor.style.removeProperty("--blue-close");
+      scissor.style.top = "22%";
+      document.querySelector("#cutResultTitle").textContent = "チョキチョキ中";
+      document.querySelector("#cutResultText").textContent = "布を切っています。スロットは今の位置で止まりました。";
+      clothPanel.classList.add("cutting");
+      setTimeout(() => {
+        const rarityText = result.rarity === "special" ? "激レア！ " : result.rarity === "rare" ? "レア！ " : "";
+        document.querySelector("#cutResultTitle").textContent = `${rarityText}${result.name}に決定！`;
+        document.querySelector("#cutResultText").textContent = "布から形が切り出されました。次は染色です。";
+        document.querySelector("#toDye").classList.remove("hidden");
+      }, 720);
+    }
+
+    function initCutDrag() {
+      const scissor = document.querySelector("#cutScissor");
+      const clothPanel = document.querySelector("#clothPanel");
+      const setScissorClose = progress => {
+        let close;
+        if (progress < .14) {
+          close = 0;
+        } else if (progress < .34) {
+          close = (progress - .14) / .2 * 24;
+        } else if (progress < .5) {
+          close = 24 - (progress - .34) / .16 * 18;
+        } else if (progress < .68) {
+          close = 6 + (progress - .5) / .18 * 22;
+        } else if (progress < .76) {
+          close = 28 - (progress - .68) / .12 * 20;
+        } else {
+          close = 8 + (progress - .76) / .24 * 24;
+        }
+        const angle = Math.max(0, Math.min(32, close));
+        scissor.style.setProperty("--red-close", `${angle}deg`);
+        scissor.style.setProperty("--blue-close", `${-angle}deg`);
+      };
+
+      scissor.addEventListener("pointerdown", event => {
+        if (isCutLocked || !document.querySelector("#cutScreen").classList.contains("active")) return;
+        event.preventDefault();
+        scissor.setPointerCapture(event.pointerId);
+        scissor.classList.add("dragging");
+        setScissorClose(0);
+        cutDrag = { pointerId: event.pointerId, startY: event.clientY, top: 82 };
+      });
+
+      scissor.addEventListener("pointermove", event => {
+        if (!cutDrag || cutDrag.pointerId !== event.pointerId || isCutLocked) return;
+        const travel = Math.max(0, cutDrag.startY - event.clientY);
+        const panelHeight = clothPanel.getBoundingClientRect().height || 210;
+        const progress = Math.min(1, travel / (panelHeight * .52));
+        const top = 82 - progress * 60;
+        scissor.style.top = `${top}%`;
+        setScissorClose(progress);
+        if (progress >= .96) completeCut();
+      });
+
+      scissor.addEventListener("pointerup", event => {
+        if (!cutDrag || cutDrag.pointerId !== event.pointerId) return;
+        cutDrag = null;
+        if (isCutLocked) return;
+        scissor.classList.remove("dragging");
+        scissor.style.removeProperty("--red-close");
+        scissor.style.removeProperty("--blue-close");
+        scissor.style.top = "";
+      });
+
+      scissor.addEventListener("pointercancel", () => {
+        cutDrag = null;
+        if (isCutLocked) return;
+        scissor.classList.remove("dragging");
+        scissor.style.removeProperty("--red-close");
+        scissor.style.removeProperty("--blue-close");
+        scissor.style.top = "";
+      });
+
+      scissor.addEventListener("keydown", event => {
+        if (isCutLocked) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          completeCut();
+        }
+      });
+    }
+
+    function initDyeDrag() {
+      const dyeHandle = document.querySelector("#dyePantsHandle");
+      const dyeVat = document.querySelector("#dyeVat");
+
+      dyeHandle.addEventListener("pointerdown", event => {
+        if (isDyeAnimating || !document.querySelector("#dyeScreen").classList.contains("active")) return;
+        event.preventDefault();
+        dyeHandle.setPointerCapture(event.pointerId);
+        dyeHandle.classList.add("dragging");
+        dyeDrag = {
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          left: 50,
+          topPx: 4
+        };
+      });
+
+      dyeHandle.addEventListener("pointermove", event => {
+        if (!dyeDrag || dyeDrag.pointerId !== event.pointerId || isDyeAnimating) return;
+        const dx = event.clientX - dyeDrag.startX;
+        const dy = event.clientY - dyeDrag.startY;
+        dyeHandle.style.left = `calc(50% + ${dx}px)`;
+        dyeHandle.style.top = `${Math.max(-12, dyeDrag.topPx + dy)}px`;
+        dyeHandle.style.transform = `translateX(-50%) rotate(${Math.max(-12, Math.min(12, dx / 12))}deg)`;
+
+        const handleBox = dyeHandle.getBoundingClientRect();
+        const vatBox = dyeVat.getBoundingClientRect();
+        const handleCenterX = handleBox.left + handleBox.width / 2;
+        const handleBottom = handleBox.bottom;
+        const inVatX = handleCenterX > vatBox.left + 28 && handleCenterX < vatBox.right - 28;
+        const inLiquid = handleBottom > vatBox.top + vatBox.height * .42;
+        if (inVatX && inLiquid) completeDye();
+      });
+
+      dyeHandle.addEventListener("pointerup", event => {
+        if (!dyeDrag || dyeDrag.pointerId !== event.pointerId) return;
+        dyeDrag = null;
+        if (isDyeAnimating) return;
+        dyeHandle.classList.remove("dragging");
+        dyeHandle.style.left = "";
+        dyeHandle.style.top = "";
+        dyeHandle.style.transform = "";
+      });
+
+      dyeHandle.addEventListener("pointercancel", () => {
+        dyeDrag = null;
+        if (isDyeAnimating) return;
+        dyeHandle.classList.remove("dragging");
+        dyeHandle.style.left = "";
+        dyeHandle.style.top = "";
+        dyeHandle.style.transform = "";
+      });
+
+      dyeHandle.addEventListener("keydown", event => {
+        if (isDyeAnimating) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          completeDye();
+        }
+      });
+    }
+
+    function initHomePanda() {
+      const panda = document.querySelector("#homePanda");
+      const bubble = document.querySelector(".home-bubble");
+      if (!panda) return;
+      let tapCount = 0;
+      let defaultBubbleIndex = 0;
+      const defaultBubbles = [
+        {
+          image: "assets/home/panda-bubble-default.png",
+          left: "58%",
+          top: "32.5%",
+          width: "31%",
+          ratio: "1155 / 688"
+        },
+        {
+          image: "assets/home/panda-bubble-default-make.png",
+          left: "55%",
+          top: "32.2%",
+          width: "36%",
+          ratio: "1123 / 609"
+        }
+      ];
+      const reactions = [
+        {
+          panda: "assets/home/panda-touch-first.png",
+          pandaLeft: "50%",
+          pandaTop: "48%",
+          pandaWidth: "36%",
+          pandaRatio: "712 / 1232",
+          bubble: "assets/home/panda-bubble-first.png",
+          bubbleLeft: "55%",
+          bubbleTop: "32.2%",
+          bubbleWidth: "36%",
+          bubbleRatio: "1213 / 650"
+        },
+        {
+          panda: "assets/home/panda-touch-shy.png",
+          pandaLeft: "50%",
+          pandaTop: "48%",
+          pandaWidth: "31%",
+          pandaRatio: "518 / 1252",
+          bubble: "assets/home/panda-bubble-shy.png",
+          bubbleLeft: "55%",
+          bubbleTop: "32.2%",
+          bubbleWidth: "37%",
+          bubbleRatio: "1202 / 571"
+        }
+      ];
+      const setReaction = reaction => {
+        panda.style.setProperty("--reaction-panda-image", `url("${reaction.panda}")`);
+        panda.style.setProperty("--reaction-panda-left", reaction.pandaLeft);
+        panda.style.setProperty("--reaction-panda-top", reaction.pandaTop);
+        panda.style.setProperty("--reaction-panda-width", reaction.pandaWidth);
+        panda.style.setProperty("--reaction-panda-ratio", reaction.pandaRatio);
+        if (!bubble) return;
+        bubble.style.setProperty("--reaction-bubble-image", `url("${reaction.bubble}")`);
+        bubble.style.setProperty("--reaction-bubble-left", reaction.bubbleLeft);
+        bubble.style.setProperty("--reaction-bubble-top", reaction.bubbleTop);
+        bubble.style.setProperty("--reaction-bubble-width", reaction.bubbleWidth);
+        bubble.style.setProperty("--reaction-bubble-ratio", reaction.bubbleRatio);
+      };
+      const setDefaultBubble = bubbleData => {
+        if (!bubble) return;
+        bubble.style.setProperty("--default-bubble-image", `url("${bubbleData.image}")`);
+        bubble.style.setProperty("--default-bubble-left", bubbleData.left);
+        bubble.style.setProperty("--default-bubble-top", bubbleData.top);
+        bubble.style.setProperty("--default-bubble-width", bubbleData.width);
+        bubble.style.setProperty("--default-bubble-ratio", bubbleData.ratio);
+      };
+      setDefaultBubble(defaultBubbles[0]);
+      setInterval(() => {
+        if (panda.classList.contains("reacting")) return;
+        defaultBubbleIndex = (defaultBubbleIndex + 1) % defaultBubbles.length;
+        setDefaultBubble(defaultBubbles[defaultBubbleIndex]);
+      }, 3000);
+      const react = () => {
+        const reaction = tapCount === 0
+          ? reactions[0]
+          : reactions[Math.floor(Math.random() * reactions.length)];
+        tapCount += 1;
+        setReaction(reaction);
+        panda.classList.add("reacting");
+        clearTimeout(panda.reactionTimer);
+        panda.reactionTimer = setTimeout(() => panda.classList.remove("reacting"), 900);
+      };
+      panda.addEventListener("pointerdown", react);
+      panda.addEventListener("click", event => {
+        event.preventDefault();
+      });
+    }
+
+    function setupDyeStage() {
+      if (!current.shape) return;
+      applyDyePants();
+      const dyeHandle = document.querySelector("#dyePantsHandle");
+      dyeHandle.classList.remove("dragging", "dunking");
+      dyeHandle.style.top = "";
+      dyeHandle.style.left = "";
+      dyeHandle.style.transform = "";
+    }
+
+    function completeDye() {
+      if (isDyeAnimating) return;
+      isDyeAnimating = true;
+      dyeDrag = null;
+      const dyeVat = document.querySelector("#dyeVat");
+      const dyeLiquid = document.querySelector("#dyeLiquid");
+      const dyeFlash = document.querySelector("#dyeFlash");
+      const dyeHandle = document.querySelector("#dyePantsHandle");
+      const isJudgedDunk = !dyeJudgedComplete;
+      let color = current.color || current.baseColor;
+      let text = dyeJudgedComplete
+        ? "判定は3回で終了。色は確定済みですが、じゃぶじゃぶは何回でもできます。"
+        : `${dyeCount + 1}/3回目の染色中。`;
+      let title = "じゃぶじゃぶ中";
+      let isRareHit = false;
+      dyeHandle.classList.remove("dragging");
+      dyeHandle.classList.add("dunking");
+      dyeHandle.style.left = "50%";
+      dyeHandle.style.top = "4px";
+      dyeHandle.style.transform = "translateX(-50%)";
+      document.querySelector("#dyeResultTitle").textContent = title;
+      document.querySelector("#dyeResultText").textContent = text;
+      dyeVat.classList.remove("chance");
+      dyeLiquid.classList.remove("gold", "rainbow");
+
+      if (isJudgedDunk) {
+        dyeCount += 1;
+        title = `${dyeCount}/3 じゃぶじゃぶ完了`;
+        text = dyeCount === 1
+          ? `${color.name}が下から1/3入りました。`
+          : dyeCount === 2
+            ? `${color.name}が下から1/2入りました。あと1回で仕上げです。`
+            : `${color.name}で全部染まりました。`;
+        if (dyeCount === 2 && !current.color?.special && Math.random() < .1) {
+          color = specialColors[Math.floor(Math.random() * specialColors.length)];
+          isRareHit = true;
+          title = color.id === "gold" ? "GOLD CHANCE!" : "RAINBOW CHANCE!";
+          text = `${color.name}が下から1/2入りました。あと1回で仕上げです。`;
+          dyeFlash.textContent = title;
+          dyeVat.classList.add("chance");
+        } else if (current.color?.special) {
+          title = `${dyeCount}/3 特殊色キープ`;
+          text = dyeCount === 3
+            ? `${current.color.name}で全部染まりました。`
+            : `${current.color.name}の輝きが下から1/2入りました。あと${Math.max(0, 3 - dyeCount)}回。`;
+        }
+        dyeJudgedComplete = dyeCount >= 3;
+        if (dyeJudgedComplete) {
+          dyeCompletionCount += 1;
+          saveDyeCompletionCount();
+          const specialCandidates = specialDyeCandidates();
+          const isSpecialChance = (debugForceSpecialDye || dyeCompletionCount % 10 === 0) && specialCandidates.length > 0;
+          if (isSpecialChance) {
+            color = allColors.find(item => item.id === "rainbow") || color;
+            current.specialEntry = null;
+            title = "スペシャル染色！！";
+            text = "10回目の染色で虹色の染色液が出ました。PUSHでスペシャルアカウントスロットを止めてください。";
+            dyeFlash.textContent = "SPECIAL!";
+            dyeVat.classList.add("chance");
+            startSpecialDrum(specialCandidates);
+          } else {
+            text = `${color.name}で染色完了。判定はここで終了です。`;
+          }
+        }
+      } else {
+        dyeFlash.textContent = "じゃぶじゃぶ";
+      }
+
+      current.color = color;
+      setTimeout(() => {
+        dyeLiquid.style.setProperty("--pants-color", color.value);
+        dyeLiquid.classList.toggle("gold", color.special === "gold");
+        dyeLiquid.classList.toggle("rainbow", color.special === "rainbow");
+        applyDyePants();
+        document.querySelector("#dyeResultTitle").textContent = title;
+        document.querySelector("#dyeResultText").textContent = text;
+        dyeHandle.classList.remove("dunking");
+        dyeHandle.style.left = "";
+        dyeHandle.style.top = "";
+        dyeHandle.style.transform = "";
+        isDyeAnimating = false;
+        if (dyeJudgedComplete && !isSpecialDrumActive && !current.specialEntry) {
+          document.querySelector("#toSew").classList.remove("hidden");
+        } else if (current.specialEntry) {
+          document.querySelector("#toSew").classList.remove("hidden");
+        }
+      }, isRareHit ? 1250 : 720);
+    }
+
+    function startTiming() {
+      if (!current.shape) return;
+      if (current.specialEntry) {
+        applySpecialImage("#sewPants", current.specialEntry);
+        document.querySelector("#sewGuide").textContent = "スペシャル縫製中。何が起きても結果は同じパンツになります。";
+      } else {
+        applyPants("#sewPants", current);
+      }
+      renderStitchHoles();
+      sewStart = performance.now();
+      const needle = document.querySelector(".needle");
+      const move = now => {
+        const cycle = 1600;
+        const progress = ((now - sewStart) % cycle) / cycle;
+        needleX = 22 + (Math.sin(progress * Math.PI * 2 - Math.PI / 2) + 1) * 28;
+        needle.style.left = `${needleX}%`;
+        markerFrame = requestAnimationFrame(move);
+      };
+      stopTiming();
+      markerFrame = requestAnimationFrame(move);
+    }
+
+    function renderStitchHoles() {
+      document.querySelector("#stitchHoles").innerHTML = stitchTargets.map((target, index) => {
+        const state = index < sewCount
+          ? (sewScores[index] === "MISS" ? "miss" : "hit")
+          : (index === sewCount ? "active" : "");
+        return `<span class="stitch-hole ${state}" style="left:${target}%"></span>`;
+      }).join("");
+      const stitchedWidth = sewCount <= 0 ? 0 : stitchTargets[Math.min(sewCount - 1, stitchTargets.length - 1)];
+      document.querySelector("#threadLine").style.width = `${stitchedWidth}%`;
+    }
+
+    function stopTiming() {
+      if (markerFrame) cancelAnimationFrame(markerFrame);
+      markerFrame = null;
+    }
+
+    function weightedMaterialPool(scores) {
+      const perfects = scores.filter(score => score === "PERFECT").length;
+      const misses = scores.filter(score => score === "MISS").length;
+      const humble = ["frayed", "holes", "cotton"];
+      const standard = ["cotton", "mesh", "linen"];
+      const premium = ["silk", "leather", "fluffy", "metal", "denim"];
+      const byIds = ids => ids.map(id => materials.find(material => material.id === id)).filter(Boolean);
+
+      if (perfects === 3) {
+        return [
+          ...byIds(premium),
+          ...byIds(premium),
+          ...byIds(["silk", "fluffy", "metal"]),
+          ...byIds(["mesh", "linen"])
+        ];
+      }
+
+      if (perfects === 2) {
+        return [
+          ...byIds(premium),
+          ...byIds(premium),
+          ...byIds(standard),
+          ...byIds(["frayed"])
+        ];
+      }
+
+      if (misses >= 2) {
+        return [
+          ...byIds(humble),
+          ...byIds(humble),
+          ...byIds(["mesh", "linen", "denim"])
+        ];
+      }
+
+      return [
+        ...byIds(standard),
+        ...byIds(standard),
+        ...byIds(["frayed", "holes"]),
+        ...byIds(premium)
+      ];
+    }
+
+    function stitch() {
+      if (sewCount >= 3) return;
+      const needle = document.querySelector(".needle");
+      needle.classList.remove("stabbing");
+      needle.offsetHeight;
+      needle.classList.add("stabbing");
+      const target = stitchTargets[sewCount];
+      const distance = Math.abs(needleX - target);
+      const result = current.specialEntry
+        ? "PERFECT"
+        : distance <= 4 ? "PERFECT" : distance <= 10 ? "GOOD" : "MISS";
+      sewScores.push(result);
+      sewCount += 1;
+      document.querySelector("#sewResults").insertAdjacentHTML("beforeend", `<span class="stamp ${result.toLowerCase()}">${result}</span>`);
+      renderStitchHoles();
+
+      if (sewCount < 3) {
+        document.querySelector("#sewRound").textContent = `${sewCount + 1}つ目の穴を狙う`;
+      } else {
+        stopTiming();
+        current.scores = sewScores;
+        document.querySelector("#sewRound").textContent = "縫製完了";
+        document.querySelector("#sewGuide").textContent = current.specialEntry
+          ? "スペシャルパンツの仕上げ完了。結果は確定済みです。"
+          : "3箇所縫えました。最後に素材を抽選して完成です。";
+        document.querySelector("#stitchButton").disabled = true;
+        document.querySelector("#toFinish").classList.remove("hidden");
+      }
+    }
+
+    function finish() {
+      if (current.specialEntry) {
+        const entry = current.specialEntry;
+        const isNew = !specialWins.includes(entry.id);
+        if (isNew) {
+          specialWins.push(entry.id);
+          saveSpecialWins();
+        }
+        saveLatestCompletion({ type: "special", id: entry.id });
+        updateCounter();
+        document.querySelector("#newBadge").classList.toggle("hidden", !isNew);
+        document.querySelector("#finalName").textContent = `図鑑No.${entry.number} ${entry.title}`;
+        document.querySelector("#finalCopy").textContent = `${entry.note}のスペシャルパンツが図鑑に登録されました。`;
+        document.querySelector("#finalSewResults").innerHTML = sewScores
+          .map(score => `<span class="stamp ${score.toLowerCase()}">${score}</span>`)
+          .join("");
+        applySpecialImage("#finalPants", entry);
+        showScreen("finishScreen");
+        return;
+      }
+
+      const pool = weightedMaterialPool(sewScores);
+      current.material = pool[Math.floor(Math.random() * pool.length)];
+
+      const item = {
+        shape: current.shape,
+        color: current.color,
+        material: current.material,
+        thread: current.thread,
+        scores: [...sewScores],
+        createdAt: Date.now()
+      };
+      const id = comboId(item);
+      const isNew = !collection[id];
+      collection[id] = item;
+      saveCollection();
+      saveLatestCompletion({ type: "normal", id });
+      updateCounter();
+
+      const number = String(comboNumber(item)).padStart(3, "0");
+      const material = materialFor(item);
+      document.querySelector("#newBadge").classList.toggle("hidden", !isNew);
+      document.querySelector("#finalName").textContent = `No.${number} ${item.color.name} × ${material.name} × ${shapeFor(item).name}`;
+      document.querySelector("#finalCopy").textContent = isNew
+        ? "新しいパンツが図鑑に登録されました。"
+        : "すでに出会ったパンツ。だけど完成した瞬間は毎回めでたい。";
+      document.querySelector("#finalSewResults").innerHTML = item.scores
+        .map(score => `<span class="stamp ${score.toLowerCase()}">${score}</span>`)
+        .join("");
+      applyPants("#finalPants", item);
+      showScreen("finishScreen");
+    }
+
+    function renderDex() {
+      updateCounter();
+      renderDexFilters();
+      const entries = allCatalogItems()
+        .filter(matchesDexFilter)
+        .map(item => {
+          const id = comboId(item);
+          return { item: collection[id] || item, id, discovered: Boolean(collection[id]) };
+        })
+        .filter(entry => !dexFilter.hideUnknown || entry.discovered)
+        .sort((a, b) => comboNumber(a.item) - comboNumber(b.item));
+      const content = document.querySelector("#dexContent");
+      if (!entries.length) {
+        content.innerHTML = `<div class="empty">条件に合うパンツがありません。</div>`;
+        return;
+      }
+
+      content.innerHTML = `<div class="collection">${entries.map(({ item, id, discovered }) => {
+        const number = String(comboNumber(item)).padStart(3, "0");
+        const specialClass = item.color.special || "";
+        const shape = shapeFor(item);
+        const material = materialFor(item);
+        const pantsImage = discovered ? pantsImageFor(item) : shape.image;
+        return `
+          <article class="dex-card ${discovered ? "filled" : "locked"}" ${discovered ? `data-dex-item="${id}" tabindex="0" role="button" aria-label="No.${number} ${shape.name}の詳細を見る"` : ""}>
+            <div class="pants-preview compact ${specialClass}" style="--pants-color:${item.color.value}; --pants-mask:url('${pantsImage}')">
+              <div class="pants-tint"></div>
+              <img class="pants-art" src="${pantsImage}" alt="${shape.name}">
+            </div>
+            <div class="dex-title">No.${number}<br>${discovered ? shape.name : "？？？"}</div>
+            <div class="dex-meta">${discovered ? `${item.color.name} / ${material.name}<br>${item.thread.name}` : "未発見"}</div>
+          </article>
+        `;
+      }).join("")}</div>`;
+    }
+
+    function renderSpecialDex() {
+      updateCounter();
+      const content = document.querySelector("#specialDexContent");
+      if (!content) return;
+      content.innerHTML = `<div class="collection special-collection">${specialPantsEntries.map((entry, index) => {
+        const storedItem = specialEntryCollectionItem(entry);
+        const item = storedItem || entry.item;
+        const discovered = specialEntryUnlocked(entry);
+        const specialClass = item.color.special || "";
+        const pantsImage = pantsImageFor(item);
+        const number = entry.number || String(index + 1).padStart(2, "0");
+        const artMarkup = entry.image
+          ? specialImageMarkup(entry, entry.title)
+          : `
+            <div class="pants-preview compact ${specialClass}" style="--pants-color:${item.color.value}; --pants-mask:url('${pantsImage}')">
+              <div class="pants-tint"></div>
+              <img class="pants-art" src="${pantsImage}" alt="${entry.title}">
+            </div>
+          `;
+        return `
+          <article class="dex-card special-card ${discovered ? "filled" : "locked"}" ${discovered ? `data-special-item="${entry.id}" tabindex="0" role="button" aria-label="${entry.title}の詳細を見る"` : ""}>
+            ${artMarkup}
+            <div class="dex-title">図鑑No.${number}<br>${discovered ? entry.title : "？？？"}</div>
+            <div class="special-note">${discovered ? entry.note : "note未登録"}</div>
+            <div class="special-person">${discovered ? entry.person : "誰の、何のパンツかはまだ秘密です。"}</div>
+          </article>
+        `;
+      }).join("")}</div>`;
+    }
+
+    document.addEventListener("click", event => {
+      const go = event.target.closest("[data-go]");
+      if (go) showScreen(go.dataset.go);
+
+      const dexCard = event.target.closest("[data-dex-item]");
+      if (dexCard) openDexModal(dexCard.dataset.dexItem);
+
+      const specialCard = event.target.closest("[data-special-item]");
+      if (specialCard) openSpecialModal(specialCard.dataset.specialItem);
+
+      const filterButton = event.target.closest("[data-dex-filter]");
+      if (filterButton) {
+        const kind = filterButton.dataset.dexFilter;
+        const value = filterButton.dataset.filterValue;
+        if (kind === "hideUnknown") {
+          dexFilter.hideUnknown = value === "true";
+        } else {
+          dexFilter[kind] = value;
+        }
+        renderDex();
+      }
+
+      const threadButton = event.target.closest("[data-thread]");
+      if (threadButton) {
+        selectedThread = threads.find(thread => thread.id === threadButton.dataset.thread);
+        renderChoices();
+      }
+
+      const colorButton = event.target.closest("[data-color]");
+      if (colorButton) {
+        selectedColor = allColors.find(color => color.id === colorButton.dataset.color);
+        renderChoices();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      const activeDexCard = event.target.closest?.("[data-dex-item]");
+      if (activeDexCard && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        openDexModal(activeDexCard.dataset.dexItem);
+      }
+      const activeSpecialCard = event.target.closest?.("[data-special-item]");
+      if (activeSpecialCard && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        openSpecialModal(activeSpecialCard.dataset.specialItem);
+      }
+      if (event.key === "Escape") closeDexModal();
+    });
+
+    document.querySelector("#dexModalClose").addEventListener("click", closeDexModal);
+    document.querySelector("#dexModal").addEventListener("click", event => {
+      if (event.target.id === "dexModal") closeDexModal();
+    });
+
+    document.querySelector("#startCut").addEventListener("click", () => {
+      resetRun();
+      showScreen("cutScreen");
+    });
+
+    document.querySelector("#toDye").addEventListener("click", () => showScreen("dyeScreen"));
+    document.querySelector("#toSew").addEventListener("click", () => showScreen("sewScreen"));
+    document.querySelector("#stitchButton").addEventListener("click", stitch);
+    document.querySelector("#toFinish").addEventListener("click", finish);
+    document.querySelector("#specialPushButton").addEventListener("click", chooseSpecialEntry);
+
+    const titleFrame = document.querySelector("#titleFrame");
+    const titleLine = document.querySelector("#titleLine");
+    const titleMessages = [
+      { lines: ["パンツがない？"] },
+      { lines: ["パンツがなければ", "みんなで作ればいい！！"], lockFirstLine: true },
+      { lines: ["600枚のパンツを", "作りましょう！！"], lockFirstLine: true }
+    ];
+
+    function titleMessageLength(message) {
+      return message.lines.join("\n").length;
+    }
+
+    function titleLineChars(message, index) {
+      if (message.lockFirstLine) {
+        return [
+          message.lines[0].length,
+          Math.min(index, message.lines[1].length)
+        ];
+      }
+      return [Math.min(index, message.lines[0].length)];
+    }
+
+    const titleSpeechFrames = titleMessages.flatMap((message, messageIndex) => {
+      const length = message.lockFirstLine ? message.lines[1].length : titleMessageLength(message);
+      return [
+        ...Array.from({ length: length + 5 }, (_, index) => ({
+          src: "assets/title/title-07-bubble-text.png",
+          messageIndex,
+          lineChars: titleLineChars(message, index),
+          ticks: 1
+        })),
+        {
+          src: "assets/title/title-07-bubble-text.png",
+          messageIndex,
+          lineChars: message.lines.map(line => line.length),
+          ticks: 8
+        }
+      ];
+    });
+    const titleStandardIntroFrames = [
+      { src: "assets/title/title-02-climb-start.png", ticks: 5 },
+      { src: "assets/title/title-03-climb-mid.png", ticks: 5 },
+      { src: "assets/title/title-04-top.png", ticks: 7 }
+    ];
+    const titleBonusIntroFrames = [
+      { src: "assets/title/title-bonus-01-buried.png", ticks: 7 },
+      { src: "assets/title/title-bonus-02-climb.png", ticks: 7 }
+    ];
+    const titleOutroFrames = [
+      { src: "assets/title/title-05-turn.png", ticks: 9 },
+      { src: "assets/title/title-06-bubble-empty.png", ticks: 5 },
+      ...titleSpeechFrames,
+      { src: "assets/title/title-08-exit-window.png", ticks: 6 },
+      { src: "assets/title/title-09-exit-far.png", ticks: 7 }
+    ];
+    let titleLoopCount = 0;
+    let titleFrames = buildTitleFrames();
+    let titleTick = 0;
+
+    function expandTitleFrames(frames) {
+      return frames.flatMap(frame => Array.from({ length: frame.ticks }, () => frame));
+    }
+
+    function buildTitleFrames() {
+      const introFrames = titleLoopCount % 3 === 2
+        ? titleBonusIntroFrames
+        : titleStandardIntroFrames;
+      return expandTitleFrames([
+        { src: "assets/title/title-01-mountain.png", ticks: 8 },
+        ...introFrames,
+        ...titleOutroFrames
+      ]);
+    }
+
+    function playTitleLoop() {
+      if (titleTick >= titleFrames.length) {
+        titleLoopCount += 1;
+        titleFrames = buildTitleFrames();
+        titleTick = 0;
+      }
+      const frame = titleFrames[titleTick];
+      if (titleFrame && !titleFrame.src.endsWith(frame.src)) {
+        titleFrame.src = frame.src;
+      }
+      const message = titleMessages[frame.messageIndex];
+      const lineChars = frame.lineChars || [];
+      if (titleLine) {
+        titleLine.innerHTML = message
+          ? message.lines.map((line, index) => `<span>${line.slice(0, lineChars[index] || 0)}</span>`).join("")
+          : "";
+        titleLine.classList.toggle("visible", Boolean(message));
+      }
+      titleTick += 1;
+    }
+
+    setInterval(playTitleLoop, 130);
+
+    renderChoices();
+    renderSlot();
+    initCutDrag();
+    initDyeDrag();
+    initHomePanda();
+    updateCounter();
+    updateHome();
+  </script>
+</body>
+</html>
