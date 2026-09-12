@@ -161,14 +161,15 @@
       position: absolute;
       left: 50%;
       bottom: 38%;
-      width: 82%;
+      width: 106%;
       aspect-ratio: 1280 / 838;
       background: url("assets/home/pants-mountain.png") center bottom / contain no-repeat;
       image-rendering: pixelated;
       pointer-events: none;
       z-index: 1;
       opacity: var(--mountain-opacity, 0);
-      transform: translate(-50%, var(--mountain-rise, 0%));
+      transform: translateX(-50%) scale(var(--mountain-scale, .58));
+      transform-origin: center bottom;
       transition: transform .7s cubic-bezier(.17,.84,.26,1), opacity .7s ease;
       filter: drop-shadow(0 8px 0 rgba(36,34,31,.12));
     }
@@ -2789,9 +2790,9 @@
       }
       if (mountain) {
         const progress = Math.max(0, Math.min(1, (count - 30) / 570));
-        const rise = 0 - progress * 22;
+        const scale = .58 + progress * .42;
         const opacity = count >= 30 ? .25 + progress * .75 : 0;
-        mountain.style.setProperty("--mountain-rise", `${rise}%`);
+        mountain.style.setProperty("--mountain-scale", scale.toFixed(3));
         mountain.style.setProperty("--mountain-opacity", opacity.toFixed(2));
       }
       const lines = [
