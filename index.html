@@ -2658,7 +2658,8 @@
         description: "小さな点をつないで大きなつながりに。今日も誰かを笑顔にできるパンツ。"
       }
     ];
-    const adminUnlockSpecialPants = true;
+    const specialProgressResetKey = "pants600SpecialProgressReset20260913";
+    const adminUnlockSpecialPants = false;
     const debugForceSpecialDye = false;
     const screenNames = {
       titleScreen: "タイトル",
@@ -2671,6 +2672,8 @@
       dexScreen: "図鑑",
       specialDexScreen: "スペシャル"
     };
+
+    resetSpecialProgressForRelease();
 
     let collection = readCollection();
     let specialWins = readSpecialWins();
@@ -2713,6 +2716,13 @@
       } catch {
         return {};
       }
+    }
+
+    function resetSpecialProgressForRelease() {
+      if (localStorage.getItem(specialProgressResetKey)) return;
+      localStorage.removeItem("pants600SpecialWins");
+      localStorage.removeItem("pants600DyeCompletionCount");
+      localStorage.setItem(specialProgressResetKey, "done");
     }
 
     function saveCollection() {
@@ -2902,7 +2912,7 @@
     }
 
     function specialEntryUnlocked(entry) {
-      return Boolean(adminUnlockSpecialPants || specialWins.includes(entry.id) || entry.unlocked || specialEntryCollectionItem(entry));
+      return Boolean(adminUnlockSpecialPants || specialWins.includes(entry.id) || entry.unlocked);
     }
 
     function escapeHtml(value) {
