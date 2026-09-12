@@ -160,8 +160,8 @@
     .home-pants-mountain {
       position: absolute;
       left: 50%;
-      bottom: 38%;
-      width: 106%;
+      bottom: var(--mountain-bottom, 38%);
+      width: var(--mountain-width, 106%);
       aspect-ratio: 1280 / 838;
       background: url("assets/home/pants-mountain.png") center bottom / contain no-repeat;
       image-rendering: pixelated;
@@ -172,6 +172,16 @@
       transform-origin: center bottom;
       transition: transform .7s cubic-bezier(.17,.84,.26,1), opacity .7s ease;
       filter: drop-shadow(0 8px 0 rgba(36,34,31,.12));
+    }
+
+    .home-pants-mountain.mid {
+      --mountain-bottom: 49%;
+      --mountain-width: 92%;
+    }
+
+    .home-pants-mountain.top {
+      --mountain-bottom: 58%;
+      --mountain-width: 78%;
     }
 
     .home-floor-pants {
@@ -2216,7 +2226,9 @@
       <h2 class="hidden" id="homeHeading">パンツ工場ホーム</h2>
       <div class="home-artboard">
         <div class="home-bg" role="img" aria-label="パンツ工場ホーム"></div>
-        <div class="home-pants-mountain" id="homePantsMountain" aria-hidden="true"></div>
+        <div class="home-pants-mountain base" id="homePantsMountainBase" aria-hidden="true"></div>
+        <div class="home-pants-mountain mid" id="homePantsMountainMid" aria-hidden="true"></div>
+        <div class="home-pants-mountain top" id="homePantsMountainTop" aria-hidden="true"></div>
         <div class="home-floor-pants" id="homeFloorPants" aria-hidden="true"></div>
         <div class="home-count dex-count" id="homeDexCount">0 / 600</div>
         <div class="home-count special-count" id="homeSpecialCount">0 / 5</div>
@@ -2800,19 +2812,25 @@
       const homeSpecialCount = document.querySelector("#homeSpecialCount");
       if (homeDexCount) homeDexCount.textContent = `${String(count).padStart(4, "\u00a0")} / 600`;
       if (homeSpecialCount) homeSpecialCount.textContent = `${String(Math.min(specialCollectionCount(), specialPantsEntries.length)).padStart(4, "\u00a0")} / ${specialPantsEntries.length}`;
-      const mountain = document.querySelector("#homePantsMountain");
+      const mountainBase = document.querySelector("#homePantsMountainBase");
+      const mountainMid = document.querySelector("#homePantsMountainMid");
+      const mountainTop = document.querySelector("#homePantsMountainTop");
       const floorPants = document.querySelector("#homeFloorPants");
       if (floorPants) {
         const floorProgress = Math.max(0, Math.min(1, (count - 10) / 20));
         floorPants.style.setProperty("--floor-pants-opacity", count >= 10 && count < 30 ? "1" : "0");
         floorPants.style.setProperty("--floor-pants-rise", "0%");
       }
-      if (mountain) {
-        const progress = Math.max(0, Math.min(1, (count - 30) / 570));
-        const scale = .58 + progress * .42;
-        mountain.style.setProperty("--mountain-scale", scale.toFixed(3));
-        mountain.style.setProperty("--mountain-opacity", count >= 30 ? "1" : "0");
-      }
+      const setMountainLayer = (element, threshold, maxCount, minScale, maxScale) => {
+        if (!element) return;
+        const progress = Math.max(0, Math.min(1, (count - threshold) / (maxCount - threshold)));
+        const scale = minScale + progress * (maxScale - minScale);
+        element.style.setProperty("--mountain-scale", scale.toFixed(3));
+        element.style.setProperty("--mountain-opacity", count >= threshold ? "1" : "0");
+      };
+      setMountainLayer(mountainBase, 30, 100, .58, .78);
+      setMountainLayer(mountainMid, 100, 300, .72, .96);
+      setMountainLayer(mountainTop, 300, 600, .78, 1);
       const lines = [
         [600, "祭りじゃああああ！！"],
         [599, "あと……1枚……！！"],
