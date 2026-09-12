@@ -390,10 +390,10 @@
     }
 
     .home-hotspot.sign {
-      left: 1.5%;
-      top: 29%;
-      width: 20%;
-      height: 15%;
+      left: 0;
+      top: 25%;
+      width: 18%;
+      height: 13%;
     }
 
     .home-hotspot.dex {
@@ -3631,26 +3631,26 @@
         };
         setGuest({
           image: "assets/home/maki-run.png",
-          left: "6%",
-          top: "44%",
-          width: "24%",
+          left: "3%",
+          top: "40%",
+          width: "25%",
           ratio: "1264 / 1244"
         });
         setTimeout(() => {
           setGuest({
             image: "assets/home/maki-run.png",
-            left: "14%",
-            top: "48%",
-            width: "24%",
+            left: "13%",
+            top: "53%",
+            width: "25%",
             ratio: "1264 / 1244"
           });
-        }, 620);
+        }, 420);
         setTimeout(() => {
           setGuest({
             image: "assets/home/maki-angry.png",
-            left: "14%",
-            top: "49%",
-            width: "22%",
+            left: "13%",
+            top: "53%",
+            width: "29%",
             ratio: "1024 / 1280",
             className: "home-guest show angry"
           });
@@ -3661,7 +3661,7 @@
             width: "35%",
             ratio: "1024 / 1280"
           });
-        }, 1250);
+        }, 1850);
         setTimeout(() => {
           setPandaReaction({
             image: "assets/home/panda-touch-shy.png",
@@ -3670,7 +3670,7 @@
             width: "31%",
             ratio: "518 / 1252"
           });
-        }, 2100);
+        }, 2800);
         setTimeout(() => {
           panda.classList.remove("reacting");
           setGuest({
@@ -3681,14 +3681,14 @@
             ratio: "1264 / 1244",
             className: "home-guest show exit"
           });
-        }, 2850);
+        }, 3500);
         setTimeout(() => {
           guest.className = "home-guest exit";
-        }, 3400);
+        }, 4050);
         setTimeout(() => {
           guest.className = "home-guest";
           guest.dataset.playing = "false";
-        }, 3700);
+        }, 4350);
       };
       setDefaultBubble(defaultBubbles[0]);
       setInterval(() => {
