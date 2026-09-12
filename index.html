@@ -160,7 +160,7 @@
     .home-pants-mountain {
       position: absolute;
       left: 50%;
-      bottom: 25%;
+      bottom: 38%;
       width: 82%;
       aspect-ratio: 1280 / 838;
       background: url("assets/home/pants-mountain.png") center bottom / contain no-repeat;
@@ -168,7 +168,7 @@
       pointer-events: none;
       z-index: 1;
       opacity: var(--mountain-opacity, 0);
-      transform: translate(-50%, var(--mountain-rise, 62%));
+      transform: translate(-50%, var(--mountain-rise, 0%));
       transition: transform .7s cubic-bezier(.17,.84,.26,1), opacity .7s ease;
       filter: drop-shadow(0 8px 0 rgba(36,34,31,.12));
     }
@@ -176,7 +176,7 @@
     .home-floor-pants {
       position: absolute;
       left: 50%;
-      bottom: 26%;
+      bottom: 38%;
       width: 50%;
       aspect-ratio: 1256 / 831;
       background: url("assets/home/floor-pants.png") center bottom / contain no-repeat;
@@ -2785,11 +2785,11 @@
       if (floorPants) {
         const floorProgress = Math.max(0, Math.min(1, (count - 10) / 20));
         floorPants.style.setProperty("--floor-pants-opacity", count >= 10 && count < 30 ? (.25 + floorProgress * .75).toFixed(2) : "0");
-        floorPants.style.setProperty("--floor-pants-rise", `${12 - floorProgress * 12}%`);
+        floorPants.style.setProperty("--floor-pants-rise", "0%");
       }
       if (mountain) {
         const progress = Math.max(0, Math.min(1, (count - 30) / 570));
-        const rise = 62 - progress * 70;
+        const rise = 0 - progress * 22;
         const opacity = count >= 30 ? .25 + progress * .75 : 0;
         mountain.style.setProperty("--mountain-rise", `${rise}%`);
         mountain.style.setProperty("--mountain-opacity", opacity.toFixed(2));
