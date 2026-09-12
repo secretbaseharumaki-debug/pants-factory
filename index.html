@@ -2658,7 +2658,7 @@
         description: "小さな点をつないで大きなつながりに。今日も誰かを笑顔にできるパンツ。"
       }
     ];
-    const specialProgressResetKey = "pants600SpecialProgressReset20260913";
+    const specialProgressResetKey = "pants600SpecialProgressReset20260913b";
     const adminUnlockSpecialPants = false;
     const debugForceSpecialDye = false;
     const screenNames = {
@@ -3616,7 +3616,10 @@
           : dyeCount === 2
             ? `${color.name}が下から1/2入りました。あと1回で仕上げです。`
             : `${color.name}で全部染まりました。`;
-        if (dyeCount === 2 && !current.color?.special && Math.random() < .1) {
+        const nextCompletionNumber = dyeCompletionCount + 1;
+        const isNextSpecialChance = (debugForceSpecialDye || nextCompletionNumber % 10 === 0) && specialDyeCandidates().length > 0;
+        const isRareColorChance = !isNextSpecialChance && (nextCompletionNumber % 5 === 0 || Math.random() < .15);
+        if (dyeCount === 2 && !current.color?.special && isRareColorChance) {
           color = specialColors[Math.floor(Math.random() * specialColors.length)];
           isRareHit = true;
           title = color.id === "gold" ? "GOLD CHANCE!" : "RAINBOW CHANCE!";
