@@ -297,7 +297,7 @@
       opacity: 0;
       z-index: 4;
       filter: drop-shadow(0 6px 0 rgba(36,34,31,.14));
-      transition: left .7s cubic-bezier(.17,.84,.26,1), opacity .18s ease, transform .2s ease;
+      transition: opacity .12s ease, transform .12s ease;
     }
 
     .home-guest.show {
@@ -312,7 +312,7 @@
     }
 
     .home-guest.exit {
-      transition: left .65s cubic-bezier(.72,.01,.92,.38), opacity .2s ease;
+      transition: opacity .22s ease;
     }
 
     .home-panda:active + .home-bubble,
@@ -3613,38 +3613,82 @@
       const playGuestScene = () => {
         if (!guest || guest.dataset.playing === "true") return;
         guest.dataset.playing = "true";
-        guest.className = "home-guest";
-        guest.style.setProperty("--guest-image", 'url("assets/home/maki-run.png")');
-        guest.style.setProperty("--guest-ratio", "1264 / 1244");
-        guest.style.setProperty("--guest-width", "24%");
-        guest.style.setProperty("--guest-top", "43%");
-        guest.style.setProperty("--guest-left", "-24%");
-        requestAnimationFrame(() => {
-          guest.classList.add("show");
-          guest.style.setProperty("--guest-left", "15%");
+        const setGuest = ({ image, left, top, width, ratio, className = "home-guest show" }) => {
+          guest.className = className;
+          guest.style.setProperty("--guest-image", `url("${image}")`);
+          guest.style.setProperty("--guest-ratio", ratio);
+          guest.style.setProperty("--guest-width", width);
+          guest.style.setProperty("--guest-top", top);
+          guest.style.setProperty("--guest-left", left);
+        };
+        const setPandaReaction = ({ image, left, top, width, ratio }) => {
+          panda.style.setProperty("--reaction-panda-image", `url("${image}")`);
+          panda.style.setProperty("--reaction-panda-left", left);
+          panda.style.setProperty("--reaction-panda-top", top);
+          panda.style.setProperty("--reaction-panda-width", width);
+          panda.style.setProperty("--reaction-panda-ratio", ratio);
+          panda.classList.add("reacting");
+        };
+        setGuest({
+          image: "assets/home/maki-run.png",
+          left: "6%",
+          top: "44%",
+          width: "24%",
+          ratio: "1264 / 1244"
         });
         setTimeout(() => {
-          guest.classList.add("angry");
-          guest.style.setProperty("--guest-left", "14%");
-          panda.style.setProperty("--reaction-panda-image", 'url("assets/home/panda-flinch.png")');
-          panda.style.setProperty("--reaction-panda-left", "51%");
-          panda.style.setProperty("--reaction-panda-top", "48%");
-          panda.style.setProperty("--reaction-panda-width", "35%");
-          panda.style.setProperty("--reaction-panda-ratio", "1024 / 1280");
-          panda.classList.add("reacting");
-        }, 900);
+          setGuest({
+            image: "assets/home/maki-run.png",
+            left: "14%",
+            top: "48%",
+            width: "24%",
+            ratio: "1264 / 1244"
+          });
+        }, 620);
+        setTimeout(() => {
+          setGuest({
+            image: "assets/home/maki-angry.png",
+            left: "14%",
+            top: "49%",
+            width: "22%",
+            ratio: "1024 / 1280",
+            className: "home-guest show angry"
+          });
+          setPandaReaction({
+            image: "assets/home/panda-flinch.png",
+            left: "51%",
+            top: "48%",
+            width: "35%",
+            ratio: "1024 / 1280"
+          });
+        }, 1250);
+        setTimeout(() => {
+          setPandaReaction({
+            image: "assets/home/panda-touch-shy.png",
+            left: "50%",
+            top: "48%",
+            width: "31%",
+            ratio: "518 / 1252"
+          });
+        }, 2100);
         setTimeout(() => {
           panda.classList.remove("reacting");
-          guest.className = "home-guest show exit";
-          guest.style.setProperty("--guest-image", 'url("assets/home/maki-run.png")');
-          guest.style.setProperty("--guest-ratio", "1264 / 1244");
-          guest.style.setProperty("--guest-width", "24%");
-          guest.style.setProperty("--guest-left", "-26%");
-        }, 2400);
+          setGuest({
+            image: "assets/home/maki-run.png",
+            left: "64%",
+            top: "61%",
+            width: "30%",
+            ratio: "1264 / 1244",
+            className: "home-guest show exit"
+          });
+        }, 2850);
+        setTimeout(() => {
+          guest.className = "home-guest exit";
+        }, 3400);
         setTimeout(() => {
           guest.className = "home-guest";
           guest.dataset.playing = "false";
-        }, 3150);
+        }, 3700);
       };
       setDefaultBubble(defaultBubbles[0]);
       setInterval(() => {
