@@ -145,6 +145,7 @@
       margin: 0 auto;
       overflow: hidden;
       background: #c48656;
+      isolation: isolate;
     }
 
     .home-bg {
@@ -152,20 +153,22 @@
       inset: 0;
       background: url("assets/home/home-bg-mobile.jpg") center / cover no-repeat;
       image-rendering: pixelated;
+      pointer-events: none;
+      z-index: 0;
     }
 
     .home-pants-mountain {
       position: absolute;
       left: 50%;
-      bottom: 36%;
-      width: 70%;
+      bottom: 25%;
+      width: 82%;
       aspect-ratio: 1280 / 838;
       background: url("assets/home/pants-mountain.png") center bottom / contain no-repeat;
       image-rendering: pixelated;
       pointer-events: none;
       z-index: 1;
-      opacity: var(--mountain-opacity, .18);
-      transform: translate(-50%, var(--mountain-rise, 78%));
+      opacity: var(--mountain-opacity, 0);
+      transform: translate(-50%, var(--mountain-rise, 62%));
       transition: transform .7s cubic-bezier(.17,.84,.26,1), opacity .7s ease;
       filter: drop-shadow(0 8px 0 rgba(36,34,31,.12));
     }
@@ -173,8 +176,8 @@
     .home-floor-pants {
       position: absolute;
       left: 50%;
-      bottom: 39%;
-      width: 46%;
+      bottom: 26%;
+      width: 50%;
       aspect-ratio: 1256 / 831;
       background: url("assets/home/floor-pants.png") center bottom / contain no-repeat;
       image-rendering: pixelated;
@@ -199,7 +202,7 @@
       image-rendering: pixelated;
       filter: drop-shadow(0 8px 0 rgba(36,34,31,.16));
       touch-action: manipulation;
-      z-index: 2;
+      z-index: 3;
     }
 
     .home-panda:active,
@@ -226,7 +229,7 @@
       background: var(--default-bubble-image, url("assets/home/panda-bubble-default.png")) center / contain no-repeat;
       image-rendering: pixelated;
       pointer-events: none;
-      z-index: 4;
+      z-index: 5;
       filter: drop-shadow(0 5px 0 rgba(36,34,31,.14));
     }
 
@@ -239,7 +242,7 @@
       background: url("assets/home/latest-helper.png") center / contain no-repeat;
       image-rendering: pixelated;
       pointer-events: none;
-      z-index: 2;
+      z-index: 3;
       filter: drop-shadow(0 6px 0 rgba(36,34,31,.14));
     }
 
@@ -250,7 +253,7 @@
       width: 20%;
       aspect-ratio: 1.45 / 1;
       pointer-events: none;
-      z-index: 3;
+      z-index: 4;
       filter: drop-shadow(0 5px 0 rgba(36,34,31,.16));
     }
 
@@ -282,7 +285,7 @@
 
     .home-count {
       position: absolute;
-      z-index: 3;
+      z-index: 6;
       display: grid;
       place-items: center;
       height: 2.9%;
@@ -322,7 +325,7 @@
       color: transparent;
       box-shadow: none;
       padding: 0;
-      z-index: 2;
+      z-index: 7;
     }
 
     .home-hotspot:focus-visible {
@@ -2782,11 +2785,11 @@
       if (floorPants) {
         const floorProgress = Math.max(0, Math.min(1, (count - 10) / 20));
         floorPants.style.setProperty("--floor-pants-opacity", count >= 10 && count < 30 ? (.25 + floorProgress * .75).toFixed(2) : "0");
-        floorPants.style.setProperty("--floor-pants-rise", `${18 - floorProgress * 18}%`);
+        floorPants.style.setProperty("--floor-pants-rise", `${12 - floorProgress * 12}%`);
       }
       if (mountain) {
         const progress = Math.max(0, Math.min(1, (count - 30) / 570));
-        const rise = 78 - progress * 92;
+        const rise = 62 - progress * 70;
         const opacity = count >= 30 ? .25 + progress * .75 : 0;
         mountain.style.setProperty("--mountain-rise", `${rise}%`);
         mountain.style.setProperty("--mountain-opacity", opacity.toFixed(2));
