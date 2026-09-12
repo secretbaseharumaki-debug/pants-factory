@@ -3647,6 +3647,15 @@
         }, 420);
         setTimeout(() => {
           setGuest({
+            image: "assets/home/maki-surprise.png",
+            left: "13%",
+            top: "53%",
+            width: "25%",
+            ratio: "1024 / 1280"
+          });
+        }, 1250);
+        setTimeout(() => {
+          setGuest({
             image: "assets/home/maki-angry.png",
             left: "13%",
             top: "53%",
@@ -3661,7 +3670,7 @@
             width: "35%",
             ratio: "1024 / 1280"
           });
-        }, 1850);
+        }, 2550);
         setTimeout(() => {
           setPandaReaction({
             image: "assets/home/panda-touch-shy.png",
@@ -3670,7 +3679,7 @@
             width: "31%",
             ratio: "518 / 1252"
           });
-        }, 2800);
+        }, 3500);
         setTimeout(() => {
           panda.classList.remove("reacting");
           setGuest({
@@ -3681,14 +3690,14 @@
             ratio: "1264 / 1244",
             className: "home-guest show exit"
           });
-        }, 3500);
+        }, 4200);
         setTimeout(() => {
           guest.className = "home-guest exit";
-        }, 4050);
+        }, 4750);
         setTimeout(() => {
           guest.className = "home-guest";
           guest.dataset.playing = "false";
-        }, 4350);
+        }, 5050);
       };
       setDefaultBubble(defaultBubbles[0]);
       setInterval(() => {
