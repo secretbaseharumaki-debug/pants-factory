@@ -1592,6 +1592,10 @@
       gap: 7px;
     }
 
+    .filter-row.advanced.hidden {
+      display: none;
+    }
+
     .filter-label {
       min-width: 52px;
       font-size: 13px;
@@ -1614,6 +1618,10 @@
       border-color: var(--ink);
       background: #ffe680;
       box-shadow: 2px 2px 0 rgba(36,34,31,.18);
+    }
+
+    .filter-toggle {
+      justify-self: start;
     }
 
     .dex-card {
@@ -2668,6 +2676,7 @@
     let specialWins = readSpecialWins();
     let dyeCompletionCount = Number(localStorage.getItem("pants600DyeCompletionCount") || 0);
     let dexFilter = { shape: "all", material: "all", color: "all", hideUnknown: false };
+    let dexFiltersOpen = false;
     let selectedThread = threads[1];
     let selectedColor = normalColors[0];
     let current = {};
@@ -3097,15 +3106,18 @@
           <button class="filter-btn ${!dexFilter.hideUnknown ? "active" : ""}" data-dex-filter="hideUnknown" data-filter-value="false">全部表示</button>
           <button class="filter-btn ${dexFilter.hideUnknown ? "active" : ""}" data-dex-filter="hideUnknown" data-filter-value="true">？？？を省く</button>
         </div>
-        <div class="filter-row">
+        <button class="filter-btn filter-toggle ${dexFiltersOpen ? "active" : ""}" data-dex-filter-toggle type="button">
+          ${dexFiltersOpen ? "絞り込みを閉じる" : "種類・質感・色で絞り込む"}
+        </button>
+        <div class="filter-row advanced ${dexFiltersOpen ? "" : "hidden"}">
           <span class="filter-label">種類</span>
           ${renderFilterButtons("shape", [{ id: "all", name: "全部" }, ...shapes])}
         </div>
-        <div class="filter-row">
+        <div class="filter-row advanced ${dexFiltersOpen ? "" : "hidden"}">
           <span class="filter-label">質感</span>
           ${renderFilterButtons("material", [{ id: "all", name: "全部" }, ...materials])}
         </div>
-        <div class="filter-row">
+        <div class="filter-row advanced ${dexFiltersOpen ? "" : "hidden"}">
           <span class="filter-label">色</span>
           ${renderFilterButtons("color", [{ id: "all", name: "全部" }, ...allColors])}
         </div>
@@ -3888,6 +3900,12 @@
 
       const specialCard = event.target.closest("[data-special-item]");
       if (specialCard) openSpecialModal(specialCard.dataset.specialItem);
+
+      const filterToggle = event.target.closest("[data-dex-filter-toggle]");
+      if (filterToggle) {
+        dexFiltersOpen = !dexFiltersOpen;
+        renderDexFilters();
+      }
 
       const filterButton = event.target.closest("[data-dex-filter]");
       if (filterButton) {
