@@ -3670,7 +3670,7 @@
             width: "35%",
             ratio: "1024 / 1280"
           });
-        }, 2550);
+        }, 3000);
         setTimeout(() => {
           setPandaReaction({
             image: "assets/home/panda-touch-shy.png",
@@ -3679,7 +3679,7 @@
             width: "31%",
             ratio: "518 / 1252"
           });
-        }, 3500);
+        }, 3950);
         setTimeout(() => {
           panda.classList.remove("reacting");
           setGuest({
@@ -3690,14 +3690,14 @@
             ratio: "1264 / 1244",
             className: "home-guest show exit"
           });
-        }, 4200);
+        }, 4650);
         setTimeout(() => {
           guest.className = "home-guest exit";
-        }, 4750);
+        }, 5200);
         setTimeout(() => {
           guest.className = "home-guest";
           guest.dataset.playing = "false";
-        }, 5050);
+        }, 5500);
       };
       setDefaultBubble(defaultBubbles[0]);
       setInterval(() => {
