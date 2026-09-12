@@ -284,6 +284,37 @@
       filter: none;
     }
 
+    .home-guest {
+      position: absolute;
+      left: var(--guest-left, -24%);
+      top: var(--guest-top, 43%);
+      width: var(--guest-width, 24%);
+      aspect-ratio: var(--guest-ratio, 1264 / 1244);
+      transform: translate(-50%, -50%);
+      background: var(--guest-image, url("assets/home/maki-run.png")) center / contain no-repeat;
+      image-rendering: pixelated;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 4;
+      filter: drop-shadow(0 6px 0 rgba(36,34,31,.14));
+      transition: left .7s cubic-bezier(.17,.84,.26,1), opacity .18s ease, transform .2s ease;
+    }
+
+    .home-guest.show {
+      opacity: 1;
+    }
+
+    .home-guest.angry {
+      --guest-image: url("assets/home/maki-angry.png");
+      --guest-ratio: 1024 / 1280;
+      --guest-width: 21%;
+      transform: translate(-50%, -50%) rotate(-2deg);
+    }
+
+    .home-guest.exit {
+      transition: left .65s cubic-bezier(.72,.01,.92,.38), opacity .2s ease;
+    }
+
     .home-panda:active + .home-bubble,
     .home-panda.reacting + .home-bubble {
       left: var(--reaction-bubble-left, 55%);
@@ -2236,6 +2267,7 @@
         <div class="home-bubble" aria-hidden="true"></div>
         <div class="home-latest-helper" aria-hidden="true"></div>
         <div class="home-latest-pants hidden" id="homeLatestPants" aria-hidden="true"></div>
+        <div class="home-guest" id="homeGuest" aria-hidden="true"></div>
         <button class="home-hotspot title" data-go="titleScreen" aria-label="スタート画面へ戻る"></button>
         <button class="home-hotspot make" data-go="selectScreen" aria-label="パンツをつくる"></button>
         <button class="home-hotspot dex" data-go="dexScreen" aria-label="図鑑をみる"></button>
@@ -3490,6 +3522,7 @@
     function initHomePanda() {
       const panda = document.querySelector("#homePanda");
       const bubble = document.querySelector(".home-bubble");
+      const guest = document.querySelector("#homeGuest");
       if (!panda) return;
       let tapCount = 0;
       let defaultBubbleIndex = 0;
@@ -3568,6 +3601,41 @@
         bubble.style.setProperty("--default-bubble-width", bubbleData.width);
         bubble.style.setProperty("--default-bubble-ratio", bubbleData.ratio);
       };
+      const playGuestScene = () => {
+        if (!guest || guest.dataset.played === "true") return;
+        guest.dataset.played = "true";
+        guest.className = "home-guest";
+        guest.style.setProperty("--guest-image", 'url("assets/home/maki-run.png")');
+        guest.style.setProperty("--guest-ratio", "1264 / 1244");
+        guest.style.setProperty("--guest-width", "24%");
+        guest.style.setProperty("--guest-top", "43%");
+        guest.style.setProperty("--guest-left", "-24%");
+        requestAnimationFrame(() => {
+          guest.classList.add("show");
+          guest.style.setProperty("--guest-left", "15%");
+        });
+        setTimeout(() => {
+          guest.classList.add("angry");
+          guest.style.setProperty("--guest-left", "14%");
+          panda.style.setProperty("--reaction-panda-image", 'url("assets/home/panda-flinch.png")');
+          panda.style.setProperty("--reaction-panda-left", "51%");
+          panda.style.setProperty("--reaction-panda-top", "48%");
+          panda.style.setProperty("--reaction-panda-width", "35%");
+          panda.style.setProperty("--reaction-panda-ratio", "1024 / 1280");
+          panda.classList.add("reacting");
+        }, 900);
+        setTimeout(() => {
+          panda.classList.remove("reacting");
+          guest.className = "home-guest show exit";
+          guest.style.setProperty("--guest-image", 'url("assets/home/maki-run.png")');
+          guest.style.setProperty("--guest-ratio", "1264 / 1244");
+          guest.style.setProperty("--guest-width", "24%");
+          guest.style.setProperty("--guest-left", "-26%");
+        }, 2400);
+        setTimeout(() => {
+          guest.className = "home-guest";
+        }, 3150);
+      };
       setDefaultBubble(defaultBubbles[0]);
       setInterval(() => {
         if (panda.classList.contains("reacting")) return;
@@ -3588,6 +3656,7 @@
       panda.addEventListener("click", event => {
         event.preventDefault();
       });
+      setTimeout(playGuestScene, 650);
     }
 
     function setupDyeStage() {
