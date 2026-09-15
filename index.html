@@ -2715,7 +2715,7 @@
         description: "小さな点をつないで大きなつながりに。今日も誰かを笑顔にできるパンツ。"
       }
     ];
-    const specialProgressResetKey = "pants600SpecialProgressReset20260913b";
+    const specialProgressResetKey = "pants600SpecialProgressReset20260915a";
     const adminUnlockSpecialPants = false;
     const debugForceSpecialDye = false;
     const screenNames = {
@@ -2837,6 +2837,14 @@
 
     function specialCollectionCount() {
       return specialPantsEntries.filter(entry => specialEntryUnlocked(entry)).length;
+    }
+
+    function completedProductionCount() {
+      return Object.keys(collection).length + specialWins.length;
+    }
+
+    function effectiveProductionCount() {
+      return Math.max(dyeCompletionCount, completedProductionCount());
     }
 
     function availableSpecialEntries() {
@@ -3778,7 +3786,7 @@
           : dyeCount === 2
             ? `${color.name}が下から1/2入りました。あと1回で仕上げです。`
             : `${color.name}で全部染まりました。`;
-        const nextCompletionNumber = dyeCompletionCount + 1;
+        const nextCompletionNumber = effectiveProductionCount() + 1;
         const isNextSpecialChance = (debugForceSpecialDye || nextCompletionNumber % 10 === 0) && specialDyeCandidates().length > 0;
         const isRareColorChance = !isNextSpecialChance && (nextCompletionNumber % 5 === 0 || Math.random() < .15);
         if (dyeCount === 2 && !current.color?.special && isRareColorChance) {
@@ -3799,7 +3807,7 @@
           dyeCompletionCount += 1;
           saveDyeCompletionCount();
           const specialCandidates = specialDyeCandidates();
-          const isSpecialChance = (debugForceSpecialDye || dyeCompletionCount % 10 === 0) && specialCandidates.length > 0;
+          const isSpecialChance = (debugForceSpecialDye || nextCompletionNumber % 10 === 0) && specialCandidates.length > 0;
           if (isSpecialChance) {
             color = allColors.find(item => item.id === "rainbow") || color;
             current.specialEntry = null;
