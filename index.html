@@ -2398,6 +2398,7 @@
             <p class="detail" id="dyeResultText">パンツをバケツへ3回入れると染色判定が完了します。</p>
             <div class="actions">
               <button class="btn secondary hidden" id="toSew">縫製へ</button>
+              <button class="btn secondary hidden" id="restoreNormalColor" type="button">通常色に戻す</button>
             </div>
           </div>
         </div>
@@ -3395,6 +3396,7 @@
       scissor.style.top = "";
       document.querySelector("#toDye").classList.add("hidden");
       document.querySelector("#toSew").classList.add("hidden");
+      document.querySelector("#restoreNormalColor").classList.add("hidden");
       document.querySelector("#dyeResultTitle").textContent = "染める準備OK";
       document.querySelector("#dyeResultText").textContent = "パンツをバケツへ3回入れると染色判定が完了します。";
       document.querySelector("#specialDrum").classList.add("hidden");
@@ -3795,9 +3797,33 @@
       dyeHandle.style.transform = "";
     }
 
+    function updateRestoreColorButton() {
+      const button = document.querySelector("#restoreNormalColor");
+      button.classList.toggle("hidden", !current.color?.special || isSpecialDrumActive || Boolean(current.specialEntry));
+      button.disabled = isDyeAnimating;
+    }
+
+    function restoreNormalColor() {
+      if (isDyeAnimating || isSpecialDrumActive || current.specialEntry || !current.color?.special) return;
+      current.color = current.baseColor;
+      const liquid = document.querySelector("#dyeLiquid");
+      liquid.classList.remove("gold", "rainbow");
+      liquid.style.setProperty("--pants-color", current.color.value);
+      document.querySelector("#dyeVat").classList.remove("chance");
+      applyDyePants();
+      document.querySelector("#dyeResultTitle").textContent = `${current.color.name}に戻しました`;
+      document.querySelector("#dyeResultText").textContent = dyeJudgedComplete
+        ? `${current.color.name}で染色完了。`
+        : `${current.color.name}で、あと${3 - dyeCount}回染めます。`;
+      updateRestoreColorButton();
+    }
+
+    document.querySelector("#restoreNormalColor").addEventListener("click", restoreNormalColor);
+
     function completeDye() {
       if (isDyeAnimating) return;
       isDyeAnimating = true;
+      updateRestoreColorButton();
       dyeDrag = null;
       const dyeVat = document.querySelector("#dyeVat");
       const dyeLiquid = document.querySelector("#dyeLiquid");
@@ -3879,6 +3905,7 @@
         dyeHandle.style.top = "";
         dyeHandle.style.transform = "";
         isDyeAnimating = false;
+        updateRestoreColorButton();
         if (dyeJudgedComplete && !isSpecialDrumActive && !current.specialEntry) {
           document.querySelector("#toSew").classList.remove("hidden");
         } else if (current.specialEntry) {
