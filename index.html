@@ -2461,7 +2461,7 @@
         </div>
         <div class="actions">
           <button class="btn" data-go="homeScreen">ホームへ</button>
-          <button class="btn secondary" data-go="dexScreen">図鑑で見る</button>
+          <button class="btn secondary" id="finalDexButton" data-go="dexScreen">図鑑で見る</button>
           <button class="btn secondary" data-go="selectScreen">もう一枚作る</button>
         </div>
       </main>
@@ -2868,14 +2868,6 @@
       return specialPantsEntries.filter(entry => specialEntryUnlocked(entry)).length;
     }
 
-    function completedProductionCount() {
-      return Object.keys(collection).length + specialWins.length;
-    }
-
-    function effectiveProductionCount() {
-      return Math.max(dyeCompletionCount, completedProductionCount());
-    }
-
     function availableSpecialEntries() {
       return specialPantsEntries.filter(entry => !specialWins.includes(entry.id));
     }
@@ -3177,6 +3169,7 @@
     }
 
     function setFinalPantsDetail(type, id) {
+      document.querySelector("#finalDexButton").dataset.go = type === "special" ? "specialDexScreen" : "dexScreen";
       const preview = document.querySelector("#finalPants");
       if (!preview) return;
       preview.dataset.finishType = type;
@@ -3835,7 +3828,7 @@
           : dyeCount === 2
             ? `${color.name}が下から1/2入りました。あと1回で仕上げです。`
             : `${color.name}で全部染まりました。`;
-        const nextCompletionNumber = effectiveProductionCount() + 1;
+        const nextCompletionNumber = dyeCompletionCount + 1;
         const isNextSpecialChance = (debugForceSpecialDye || nextCompletionNumber % 10 === 0) && specialDyeCandidates().length > 0;
         const isRareColorChance = !isNextSpecialChance && (nextCompletionNumber % 5 === 0 || Math.random() < .15);
         if (dyeCount === 2 && !current.color?.special && isRareColorChance) {
