@@ -1594,6 +1594,35 @@
       width: min(390px, 78vw);
     }
 
+    #finalPants {
+      cursor: pointer;
+      transition: transform .16s ease, filter .16s ease;
+    }
+
+    #finalPants:hover,
+    #finalPants:focus-visible {
+      transform: translateY(-3px);
+      filter: drop-shadow(0 10px 0 rgba(36,34,31,.14));
+      outline: 0;
+    }
+
+    #finalPants::after {
+      content: "タップで説明";
+      position: absolute;
+      left: 50%;
+      bottom: -18px;
+      transform: translateX(-50%);
+      padding: 5px 10px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+      box-shadow: 3px 3px 0 rgba(36,34,31,.12);
+    }
+
     .sew-result-list {
       display: flex;
       flex-wrap: wrap;
@@ -3147,6 +3176,26 @@
       document.querySelector("#dexModal")?.classList.add("hidden");
     }
 
+    function setFinalPantsDetail(type, id) {
+      const preview = document.querySelector("#finalPants");
+      if (!preview) return;
+      preview.dataset.finishType = type;
+      preview.dataset.finishItem = id;
+      preview.setAttribute("role", "button");
+      preview.setAttribute("tabindex", "0");
+      preview.setAttribute("aria-label", "完成したパンツの説明を見る");
+    }
+
+    function openFinalPantsDetail() {
+      const preview = document.querySelector("#finalPants");
+      if (!preview?.dataset.finishItem) return;
+      if (preview.dataset.finishType === "special") {
+        openSpecialModal(preview.dataset.finishItem);
+      } else {
+        openDexModal(preview.dataset.finishItem);
+      }
+    }
+
     function catalogItem(shape, material, color) {
       return {
         shape,
@@ -3972,6 +4021,7 @@
           .map(score => `<span class="stamp ${score.toLowerCase()}">${score}</span>`)
           .join("");
         applySpecialImage("#finalPants", entry);
+        setFinalPantsDetail("special", entry.id);
         showScreen("finishScreen");
         return;
       }
@@ -4005,6 +4055,7 @@
         .map(score => `<span class="stamp ${score.toLowerCase()}">${score}</span>`)
         .join("");
       applyPants("#finalPants", item);
+      setFinalPantsDetail("normal", id);
       showScreen("finishScreen");
     }
 
@@ -4126,6 +4177,10 @@
         event.preventDefault();
         openSpecialModal(activeSpecialCard.dataset.specialItem);
       }
+      if (event.target.id === "finalPants" && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        openFinalPantsDetail();
+      }
       if (event.key === "Escape") closeDexModal();
     });
 
@@ -4133,6 +4188,7 @@
     document.querySelector("#dexModal").addEventListener("click", event => {
       if (event.target.id === "dexModal") closeDexModal();
     });
+    document.querySelector("#finalPants").addEventListener("click", openFinalPantsDetail);
 
     document.querySelector("#startCut").addEventListener("click", () => {
       resetRun();
